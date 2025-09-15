@@ -22,6 +22,12 @@ functions:
       - httpApi:
           path: /api/rooms
           method: POST
+  PostOrder:
+    handler: functions/PostOrder/index.handler
+    events:
+      - httpApi:
+          path: /api/orders
+          method: POST
 
 resources:
   Resources:
