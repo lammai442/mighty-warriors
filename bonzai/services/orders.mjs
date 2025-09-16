@@ -1,14 +1,12 @@
 import { client } from './client.mjs';
 import {
   QueryCommand,
-  PutItemCommand,
   UpdateItemCommand,
+  PutItemCommand,
 } from '@aws-sdk/client-dynamodb';
 import { unmarshall, marshall } from '@aws-sdk/util-dynamodb';
+import { generateDate } from '../utils/generateDate.mjs';
 import { generateId } from '../utils/generateId.mjs';
-import { generateDate } from '../utils/generateDate.mjs';
-
-import { generateDate } from '../utils/generateDate.mjs';
 export const getAllOrders = async () => {
   const command = new QueryCommand({
     TableName: 'bonzai-db',
@@ -48,5 +46,114 @@ export const getOneOrder = async (orderId) => {
   } catch (error) {
     console.log('ERROR in orders-db', error.message);
     return false;
+  }
+};
+
+export const createOrder = async (orderRequest) => {
+  // Bestämmer vad objektet man vill skicka in ska innehålla
+  const order = {
+    pk: 'ORDER',
+    sk: generateId('ORDER'),
+    numberOfNights: orderRequest.nights,
+    numberOfGuests: orderRequest.guests,
+    bookedBy: orderRequest.name,
+    // orderRequest.rooms är en array av objekt som innehåller rummen
+    roomsBooked: orderRequest.rooms,
+    price: orderRequest.price,
+    createdAt: generateDate(),
+  };
+
+  // "marshall(order)" ser till att objektet följer systemet med { S: } { N: } osv.
+  const params = {
+    TableName: 'bonzai-db',
+    Item: marshall(order),
+  };
+
+  // Bara att skicka in params efteråt
+  const result = await client.send(new PutItemCommand(params));
+  return result;
+};
+
+export const editOrder = async (updates, orderId) => {
+  const command = new UpdateItemCommand({
+    TableName: 'bonzai-db',
+    Key: { pk: { S: 'ORDER' }, sk: { S: `ORDER#${orderId}` } },
+    UpdateExpression:
+      'SET #numberOfGuests = :numberOfGuests, #numberOfNights = :numberOfNights, #modifiedAt = :modifiedAt',
+    ExpressionAttributeNames: {
+      '#numberOfGuests': 'numberOfGuests',
+      '#numberOfNights': 'numberOfNights',
+      '#modifiedAt': 'modifiedAt',
+      // '#hiredRooms': 'hiredRooms',
+    },
+    ExpressionAttributeValues: {
+      ':numberOfGuests': {
+        N: updates.numberOfGuests
+          ? updates.numberOfGuest.toString()
+          : 'numberOfGuests',
+      },
+      ':numberOfNights': { N: updates.numberOfNights.toString() },
+      ':modifiedAt': { S: generateDate() },
+    },
+
+    ReturnValues: 'UPDATED_NEW',
+  });
+
+  try {
+    const result = await client.send(command);
+    return unmarshall(result.Attributes);
+  } catch (error) {
+    console.log('Error in PutOrderById-db', error.message);
+  }
+};
+
+export const updateNumberOfNights = async (amount, orderId) => {
+  const command = new UpdateItemCommand({
+    TableName: 'bonzai-db',
+    Key: { pk: { S: 'ORDER' }, sk: { S: `ORDER#${orderId}` } },
+    UpdateExpression:
+      'SET #numberOfNights = :numberOfNights, #modifiedAt = :modifiedAt',
+    ExpressionAttributeNames: {
+      '#numberOfNights': 'numberOfNights',
+      '#modifiedAt': 'modifiedAt',
+    },
+    ExpressionAttributeValues: {
+      ':numberOfNights': { N: amount.toString() },
+      ':modifiedAt': { S: generateDate() },
+    },
+
+    ReturnValues: 'UPDATED_NEW',
+  });
+
+  try {
+    const result = await client.send(command);
+    return unmarshall(result.Attributes);
+  } catch (error) {
+    console.log('Error in PutOrderById-db', error.message);
+  }
+};
+export const updateNumberOfGuests = async (amount, orderId) => {
+  const command = new UpdateItemCommand({
+    TableName: 'bonzai-db',
+    Key: { pk: { S: 'ORDER' }, sk: { S: `ORDER#${orderId}` } },
+    UpdateExpression:
+      'SET #numberOfGuests = :numberOfGuests, #modifiedAt = :modifiedAt',
+    ExpressionAttributeNames: {
+      '#numberOfGuests': 'numberOfGuests',
+      '#modifiedAt': 'modifiedAt',
+    },
+    ExpressionAttributeValues: {
+      ':numberOfGuests': { N: amount.toString() },
+      ':modifiedAt': { S: generateDate() },
+    },
+
+    ReturnValues: 'UPDATED_NEW',
+  });
+
+  try {
+    const result = await client.send(command);
+    return unmarshall(result.Attributes);
+  } catch (error) {
+    console.log('Error in PutOrderById-db', error.message);
   }
 };

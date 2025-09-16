@@ -9,48 +9,47 @@ import {
   updateNumberOfGuests,
 } from '../../services/orders.mjs';
 import httpJsonBodyParser from '@middy/http-json-body-parser';
-import { getRoomById } from '../../services/rooms.mjs';
+import { getAllRooms, getRoomById } from '../../services/rooms.mjs';
 export const handler = middy(async (event) => {
   const { orderId } = event.pathParameters || {};
   const currentOrder = await getOneOrder(orderId);
-  const { roomId, newRoomId, numberOfGuests, numberOfNights } = event.body;
-
-  //   let newOrder = {};
-
-  //   if (newRoomId) {
-  //     const room = await getRoomById(event.body.newRoomId);
-  //     console.log('ROOM: ', room);
-
-  //     if (room.available) {
-  //       newOrder = {
-  //         ...currentOrder,
-  //       };
-  //     }
-  //   }
-  //   let numberOfBeds = 0;
-
-  //   currentOrder.hiredRooms.forEach((room) => {
-  //     numberOfBeds += room.beds;
-  //   });
-
-  //   if (numberOfBeds === event.body.numberOfBeds) {
-  // const updates = event.body;
+  const updateReq = event.body;
+  console.log('CURRENTORDER: ', currentOrder);
 
   if (orderId) {
-    // const result = await editOrder(updates, orderId);
     let result = {};
 
-    if (numberOfNights) {
-      const updatedNights = await updateNumberOfNights(numberOfNights, orderId);
+    if (updateReq.changeRoomId && updateReq.newRoomId) {
+      const allRooms = await getAllRooms();
+      let updatedRooms = [];
+
+      const currentOrderWithout = currentOrder.roomsBooked.filter(
+        r.sk !== updateReq.changeRoomId
+      );
+    }
+
+    // Om användaren skickar med nights i bodyn
+    if (updateReq.nights) {
+      const updatedNights = await updateNumberOfNights(
+        updateReq.nights,
+        orderId
+      );
+      // Lägger in ändringen i result
       result = { ...result, ...updatedNights };
     }
-    if (numberOfGuests) {
-      const updatedGuests = await updateNumberOfGuests(numberOfGuests, orderId);
+    // Om användaren skickar med ny antal gäster i bodyn
+    if (updateReq.guests) {
+      const updatedGuests = await updateNumberOfGuests(
+        updateReq.guests,
+        orderId
+      );
+      // Lägger in ändringen i result
       result = { ...result, ...updatedGuests };
     }
     return sendResponses(200, {
       success: true,
       updatedOrder: result,
+      currentOrder: currentOrder,
     });
   } else {
     return sendResponses(400, {
