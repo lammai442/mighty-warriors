@@ -1,6 +1,9 @@
 import { client } from './client.mjs';
-import { QueryCommand } from '@aws-sdk/client-dynamodb';
-import { unmarshall } from '@aws-sdk/util-dynamodb';
+import { QueryCommand, PutItemCommand } from '@aws-sdk/client-dynamodb';
+import { unmarshall, marshall } from '@aws-sdk/util-dynamodb';
+import { generateId } from '../utils/generateId.mjs';
+import { generateDate } from '../utils/generateDate.mjs';
+
 export const getAllOrders = async () => {
   const command = new QueryCommand({
     TableName: 'bonzai-db',
@@ -41,4 +44,29 @@ export const getOneOrder = async (orderId) => {
     console.log('ERROR in orders-db', error.message);
     return false;
   }
+};
+
+export const createOrder = async (orderRequest) => {
+  // Bestämmer vad objektet man vill skicka in ska innehålla
+  const order = {
+    pk: 'ORDER',
+    sk: generateId('ORDER'),
+    numberOfNights: orderRequest.nights,
+    numberOfGuests: orderRequest.guests,
+    bookedBy: orderRequest.name,
+    // orderRequest.rooms är en array av objekt som innehåller rummen
+    roomsBooked: orderRequest.rooms,
+    price: orderRequest.price,
+    createdAt: generateDate(),
+  };
+
+  // "marshall(order)" ser till att objektet följer systemet med { S: } { N: } osv.
+  const params = {
+    TableName: 'bonzai-db',
+    Item: marshall(order),
+  };
+
+  // Bara att skicka in params efteråt
+  const result = await client.send(new PutItemCommand(params));
+  return result;
 };
