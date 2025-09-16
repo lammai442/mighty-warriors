@@ -1,17 +1,17 @@
-import { client } from "./client.mjs";
-import { PutItemCommand, QueryCommand } from "@aws-sdk/client-dynamodb";
-import { generateId } from "../utils/generateId.mjs";
-import { unmarshall } from "@aws-sdk/util-dynamodb";
+import { client } from './client.mjs';
+import { PutItemCommand, QueryCommand } from '@aws-sdk/client-dynamodb';
+import { generateId } from '../utils/generateId.mjs';
+import { unmarshall } from '@aws-sdk/util-dynamodb';
 
 export const addRoom = async (room) => {
-  console.log("room:", room);
+  console.log('room:', room);
   const id = `ROOM#${generateId(room.type)}`;
-  console.log("id: ", id);
+  console.log('id: ', id);
 
   const command = new PutItemCommand({
-    TableName: "bonzai-db",
+    TableName: 'bonzai-db',
     Item: {
-      pk: { S: "ROOM" },
+      pk: { S: 'ROOM' },
       sk: { S: id },
       available: { BOOL: room.available },
       beds: { N: room.beds.toString() },
@@ -24,18 +24,18 @@ export const addRoom = async (room) => {
     await client.send(command);
     return true;
   } catch (error) {
-    console.log("ERROR from rooms-db", error.message);
+    console.log('ERROR from rooms-db', error.message);
     return false;
   }
 };
 
 export const getAllRooms = async () => {
   const command = new QueryCommand({
-    TableName: "bonzai-db",
-    KeyConditionExpression: "pk= :pk AND begins_with(sk, :sk)",
+    TableName: 'bonzai-db',
+    KeyConditionExpression: 'pk= :pk AND begins_with(sk, :sk)',
     ExpressionAttributeValues: {
-      ":pk": { S: "ROOM" },
-      ":sk": { S: "ROOM" },
+      ':pk': { S: 'ROOM' },
+      ':sk': { S: 'ROOM' },
     },
   });
 
@@ -44,20 +44,20 @@ export const getAllRooms = async () => {
     const rooms = Items.map((item) => unmarshall(item));
     return rooms;
   } catch (error) {
-    console.log("ERROR in db", error.message);
+    console.log('ERROR in db', error.message);
     return false;
   }
 };
 export const getAvailableRooms = async () => {
   const command = new QueryCommand({
-    TableName: "bonzai-db",
-    KeyConditionExpression: "pk = :pk AND begins_with(sk, :sk)",
+    TableName: 'bonzai-db',
+    KeyConditionExpression: 'pk = :pk AND begins_with(sk, :sk)',
     ExpressionAttributeValues: {
-      ":pk": { S: "ROOM" },
-      ":sk": { S: "ROOM" },
-      ":available": { BOOL: true },
+      ':pk': { S: 'ROOM' },
+      ':sk': { S: 'ROOM' },
+      ':available': { BOOL: true },
     },
-    FilterExpression: "available = :available",
+    FilterExpression: 'available = :available',
   });
 
   try {
@@ -65,7 +65,7 @@ export const getAvailableRooms = async () => {
     const rooms = Items.map((item) => unmarshall(item));
     return rooms;
   } catch (error) {
-    console.log("ERROR in db", error.message);
+    console.log('ERROR in db', error.message);
     return false;
   }
 };
