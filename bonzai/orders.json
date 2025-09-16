@@ -1,0 +1,64 @@
+{
+  "bonzai-db": [
+    {
+      "PutRequest": {
+        "Item": {
+          "pk": { "S": "ORDER" },
+          "sk": { "S": "ORDER#f8d9a" },
+          "numberOfNights": { "N": "1" },
+          "numberOfGuests": { "N": "2" },
+          "bookedBy": { "S": "USER#USERa1b2c" },
+          "hiredRooms": {
+            "S": "[{\"room\":\"room-single-65sdf\",\"available\":false,\"numberOfGuests\":1,\"price\":500,\"numberOfNights\":1},{\"room\":\"room-single-65sdf\",\"available\":false,\"numberOfGuests\":1,\"price\":500,\"numberOfNights\":1}]"
+          },
+          "createdAt": { "S": "2025-09-15T13:15:21.000Z" }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "pk": { "S": "ORDER" },
+          "sk": { "S": "ORDER#93b7e" },
+          "numberOfNights": { "N": "3" },
+          "numberOfGuests": { "N": "1" },
+          "bookedBy": { "S": "USER#USERd4f9x" },
+          "hiredRooms": {
+            "S": "[{\"room\":\"room-single-65sdf\",\"available\":false,\"numberOfGuests\":1,\"price\":500,\"numberOfNights\":3}]"
+          },
+          "createdAt": { "S": "2025-09-15T13:15:22.000Z" }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "pk": { "S": "ORDER" },
+          "sk": { "S": "ORDER#6a4c2" },
+          "numberOfNights": { "N": "5" },
+          "numberOfGuests": { "N": "3" },
+          "bookedBy": { "S": "USER#USERm7n8o" },
+          "hiredRooms": {
+            "S": "[{\"room\":\"room-double-65sdf\",\"available\":false,\"numberOfGuests\":2,\"price\":1000,\"numberOfNights\":5},{\"room\":\"room-single-65sdf\",\"available\":false,\"numberOfGuests\":1,\"price\":500,\"numberOfNights\":5}]"
+          },
+          "createdAt": { "S": "2025-09-15T13:15:23.000Z" }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "pk": { "S": "ORDER" },
+          "sk": { "S": "ORDER#c2e7f" },
+          "numberOfNights": { "N": "2" },
+          "numberOfGuests": { "N": "4" },
+          "bookedBy": { "S": "USER#USERz9y1k" },
+          "hiredRooms": {
+            "S": "[{\"room\":\"room-double-65sdf\",\"available\":false,\"numberOfGuests\":2,\"price\":1000,\"numberOfNights\":2},{\"room\":\"room-double-65sdf\",\"available\":false,\"numberOfGuests\":2,\"price\":1000,\"numberOfNights\":2}]"
+          },
+          "createdAt": { "S": "2025-09-15T13:15:24.000Z" }
+        }
+      }
+    }
+  ]
+}
