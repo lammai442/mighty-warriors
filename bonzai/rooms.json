@@ -1,0 +1,244 @@
+{
+  "bonzai-db": [
+    {
+      "PutRequest": {
+        "Item": {
+          "pk": { "S": "ROOM" },
+          "sk": { "S": "ROOM#DOUBLE#0d01f" },
+          "available": { "BOOL": true },
+          "beds": { "N": "2" },
+          "createdAt": { "S": "2025-09-15T13:05:18.537Z" },
+          "price": { "N": "1000" }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "pk": { "S": "ROOM" },
+          "sk": { "S": "ROOM#DOUBLE#5ea73" },
+          "available": { "BOOL": true },
+          "beds": { "N": "2" },
+          "createdAt": { "S": "2025-09-15T13:05:19.164Z" },
+          "price": { "N": "1000" }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "pk": { "S": "ROOM" },
+          "sk": { "S": "ROOM#DOUBLE#6f587" },
+          "available": { "BOOL": true },
+          "beds": { "N": "2" },
+          "createdAt": { "S": "2025-09-15T13:05:17.185Z" },
+          "price": { "N": "1000" }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "pk": { "S": "ROOM" },
+          "sk": { "S": "ROOM#DOUBLE#7a8c6" },
+          "available": { "BOOL": true },
+          "beds": { "N": "2" },
+          "createdAt": { "S": "2025-09-15T13:05:15.482Z" },
+          "price": { "N": "1000" }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "pk": { "S": "ROOM" },
+          "sk": { "S": "ROOM#DOUBLE#aafc7" },
+          "available": { "BOOL": true },
+          "beds": { "N": "2" },
+          "createdAt": { "S": "2025-09-15T13:05:17.883Z" },
+          "price": { "N": "1000" }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "pk": { "S": "ROOM" },
+          "sk": { "S": "ROOM#DOUBLE#f55dc" },
+          "available": { "BOOL": true },
+          "beds": { "N": "2" },
+          "createdAt": { "S": "2025-09-15T13:05:16.409Z" },
+          "price": { "N": "1000" }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "pk": { "S": "ROOM" },
+          "sk": { "S": "ROOM#SINGLE#1cbf5" },
+          "available": { "BOOL": true },
+          "beds": { "N": "1" },
+          "createdAt": { "S": "2025-09-15T13:04:49.493Z" },
+          "price": { "N": "500" }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "pk": { "S": "ROOM" },
+          "sk": { "S": "ROOM#SINGLE#2debb" },
+          "available": { "BOOL": true },
+          "beds": { "N": "1" },
+          "createdAt": { "S": "2025-09-15T13:04:48.577Z" },
+          "price": { "N": "500" }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "pk": { "S": "ROOM" },
+          "sk": { "S": "ROOM#SINGLE#2e309" },
+          "available": { "BOOL": true },
+          "beds": { "N": "1" },
+          "createdAt": { "S": "2025-09-15T13:04:45.686Z" },
+          "price": { "N": "500" }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "pk": { "S": "ROOM" },
+          "sk": { "S": "ROOM#SINGLE#3ddc4" },
+          "available": { "BOOL": true },
+          "beds": { "N": "1" },
+          "createdAt": { "S": "2025-09-15T13:04:46.657Z" },
+          "price": { "N": "500" }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "pk": { "S": "ROOM" },
+          "sk": { "S": "ROOM#SINGLE#489de" },
+          "available": { "BOOL": true },
+          "beds": { "N": "1" },
+          "createdAt": { "S": "2025-09-15T13:02:56.171Z" },
+          "price": { "N": "500" }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "pk": { "S": "ROOM" },
+          "sk": { "S": "ROOM#SINGLE#782cc" },
+          "available": { "BOOL": true },
+          "beds": { "N": "1" },
+          "createdAt": { "S": "2025-09-15T13:04:50.366Z" },
+          "price": { "N": "500" }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "pk": { "S": "ROOM" },
+          "sk": { "S": "ROOM#SINGLE#c5e75" },
+          "available": { "BOOL": true },
+          "beds": { "N": "1" },
+          "createdAt": { "S": "2025-09-15T13:03:07.583Z" },
+          "price": { "N": "500" }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "pk": { "S": "ROOM" },
+          "sk": { "S": "ROOM#SINGLE#c8851" },
+          "available": { "BOOL": true },
+          "beds": { "N": "1" },
+          "createdAt": { "S": "2025-09-15T13:04:47.675Z" },
+          "price": { "N": "500" }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "pk": { "S": "ROOM" },
+          "sk": { "S": "ROOM#SINGLE#f1542" },
+          "available": { "BOOL": true },
+          "beds": { "N": "1" },
+          "createdAt": { "S": "2025-09-15T13:03:08.895Z" },
+          "price": { "N": "500" }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "pk": { "S": "ROOM" },
+          "sk": { "S": "ROOM#SINGLE#f45c8" },
+          "available": { "BOOL": true },
+          "beds": { "N": "1" },
+          "createdAt": { "S": "2025-09-15T13:04:44.648Z" },
+          "price": { "N": "500" }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "pk": { "S": "ROOM" },
+          "sk": { "S": "ROOM#SUITE#17a69" },
+          "available": { "BOOL": true },
+          "beds": { "N": "3" },
+          "createdAt": { "S": "2025-09-15T13:05:52.932Z" },
+          "price": { "N": "1500" }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "pk": { "S": "ROOM" },
+          "sk": { "S": "ROOM#SUITE#237e8" },
+          "available": { "BOOL": true },
+          "beds": { "N": "3" },
+          "createdAt": { "S": "2025-09-15T13:05:53.849Z" },
+          "price": { "N": "1500" }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "pk": { "S": "ROOM" },
+          "sk": { "S": "ROOM#SUITE#8e943" },
+          "available": { "BOOL": true },
+          "beds": { "N": "3" },
+          "createdAt": { "S": "2025-09-15T13:05:52.097Z" },
+          "price": { "N": "1500" }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "pk": { "S": "ROOM" },
+          "sk": { "S": "ROOM#SUITE#d6ab6" },
+          "available": { "BOOL": true },
+          "beds": { "N": "3" },
+          "createdAt": { "S": "2025-09-15T13:05:51.361Z" },
+          "price": { "N": "1500" }
+        }
+      }
+    }
+  ]
+}
