@@ -22,6 +22,12 @@ functions:
       - httpApi:
           path: /api/rooms
           method: POST
+  DeleteOrder:
+    handler: functions/DeleteOrder/index.handler
+    events:
+      - httpApi:
+          path: /api/orders/{orderID}
+          method: DELETE
 
 resources:
   Resources:
