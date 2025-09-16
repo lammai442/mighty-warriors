@@ -2,9 +2,14 @@ import middy from '@middy/core';
 import { sendResponses } from '../../responses/index.mjs';
 import { errorHandler } from '../../middelwares/errorHandler.mjs';
 import { getRoomById, toggleAvailableRoom } from '../../services/rooms.mjs';
+import { getOneOrder, getOrderById } from '../../services/orders.mjs';
+import { validateOrderId } from '../../middelwares/validateOrderId.mjs';
 
 export const handler = middy(async (event) => {
-  const param = event.pathParameters.orderID;
+  const orderId = event.pathParameters.orderId;
+
+  const order = await getOrderById(orderId);
+  console.log(order);
 
   // Togglar rummet från bokat till ledigt.
   const roomID = 'ROOM#DOUBLE#0fe89';
@@ -15,7 +20,8 @@ export const handler = middy(async (event) => {
   if (result)
     return sendResponses(200, {
       message: 'success',
-      param: param,
+      orderId: orderId,
+      order: order,
       result: result,
     });
   else
@@ -23,4 +29,6 @@ export const handler = middy(async (event) => {
       success: false,
       message: 'Order could not be found.',
     });
-}).use(errorHandler());
+})
+  .use(validateOrderId())
+  .use(errorHandler());

@@ -1,9 +1,7 @@
-<<<<<<< HEAD
-import { client } from "./client.mjs";
-=======
 import { client } from './client.mjs';
-import { QueryCommand } from '@aws-sdk/client-dynamodb';
+import { QueryCommand, GetItemCommand } from '@aws-sdk/client-dynamodb';
 import { unmarshall } from '@aws-sdk/util-dynamodb';
+
 export const getAllOrders = async () => {
   const command = new QueryCommand({
     TableName: 'bonzai-db',
@@ -45,4 +43,21 @@ export const getOneOrder = async (orderId) => {
     return false;
   }
 };
->>>>>>> dev
+
+export const getOrderById = async (orderId) => {
+  const command = new GetItemCommand({
+    TableName: 'bonzai-db',
+    Key: {
+      pk: { S: 'ORDER' },
+      sk: { S: `ORDER#${orderId}` },
+    },
+  });
+
+  try {
+    const { Item } = await client.send(command);
+    return unmarshall(Item);
+  } catch (error) {
+    console.log('ERROR in db', error.message);
+    return false;
+  }
+};

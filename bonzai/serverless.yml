@@ -22,14 +22,12 @@ functions:
       - httpApi:
           path: /api/rooms
           method: POST
-<<<<<<< HEAD
   DeleteOrder:
     handler: functions/DeleteOrder/index.handler
     events:
       - httpApi:
-          path: /api/orders/{orderID}
+          path: /api/orders/{orderId}
           method: DELETE
-=======
   GetOrderById:
     handler: functions/GetOrderById/index.handler
     events:
@@ -42,7 +40,9 @@ functions:
       - httpApi:
           path: /api/orders
           method: GET
->>>>>>> dev
+
+plugins:
+  - serverless-offline
 
 resources:
   Resources:
