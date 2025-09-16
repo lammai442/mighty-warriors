@@ -2,16 +2,56 @@ import middy from '@middy/core';
 import { sendResponses } from '../../responses/index.mjs';
 import { errorHandler } from '../../middelwares/errorHandler.mjs';
 import { validateOrderId } from '../../middelwares/validateOrderId.mjs';
-import { editOrder } from '../../services/orders.mjs';
+import {
+  editOrder,
+  updateNumberOfNights,
+  getOneOrder,
+  updateNumberOfGuests,
+} from '../../services/orders.mjs';
 import httpJsonBodyParser from '@middy/http-json-body-parser';
-
+import { getRoomById } from '../../services/rooms.mjs';
 export const handler = middy(async (event) => {
   const { orderId } = event.pathParameters || {};
-  const updates = event.body;
+  const currentOrder = await getOneOrder(orderId);
+  const { roomId, newRoomId, numberOfGuests, numberOfNights } = event.body;
+
+  //   let newOrder = {};
+
+  //   if (newRoomId) {
+  //     const room = await getRoomById(event.body.newRoomId);
+  //     console.log('ROOM: ', room);
+
+  //     if (room.available) {
+  //       newOrder = {
+  //         ...currentOrder,
+  //       };
+  //     }
+  //   }
+  //   let numberOfBeds = 0;
+
+  //   currentOrder.hiredRooms.forEach((room) => {
+  //     numberOfBeds += room.beds;
+  //   });
+
+  //   if (numberOfBeds === event.body.numberOfBeds) {
+  // const updates = event.body;
 
   if (orderId) {
-    const result = await editOrder(updates, orderId);
-    return sendResponses(200, { success: true, updatedOrder: result });
+    // const result = await editOrder(updates, orderId);
+    let result = {};
+
+    if (numberOfNights) {
+      const updatedNights = await updateNumberOfNights(numberOfNights, orderId);
+      result = { ...result, ...updatedNights };
+    }
+    if (numberOfGuests) {
+      const updatedGuests = await updateNumberOfGuests(numberOfGuests, orderId);
+      result = { ...result, ...updatedGuests };
+    }
+    return sendResponses(200, {
+      success: true,
+      updatedOrder: result,
+    });
   } else {
     return sendResponses(400, {
       success: false,

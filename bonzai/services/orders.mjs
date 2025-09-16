@@ -49,23 +49,80 @@ export const editOrder = async (updates, orderId) => {
     TableName: 'bonzai-db',
     Key: { pk: { S: 'ORDER' }, sk: { S: `ORDER#${orderId}` } },
     UpdateExpression:
-      'SET #numberOfGuests = :numberOfGuests, #numberOfNights = :numberOfNights, #modifiedAt = :modifiedAt, #hiredRooms = :hiredRooms',
+      'SET #numberOfGuests = :numberOfGuests, #numberOfNights = :numberOfNights, #modifiedAt = :modifiedAt',
     ExpressionAttributeNames: {
       '#numberOfGuests': 'numberOfGuests',
       '#numberOfNights': 'numberOfNights',
       '#modifiedAt': 'modifiedAt',
-      '#hiredRooms': 'hiredRooms',
+      // '#hiredRooms': 'hiredRooms',
     },
     ExpressionAttributeValues: {
-      ':numberOfGuests': { N: updates.numberOfGuests.toString() },
+      ':numberOfGuests': {
+        N: updates.numberOfGuests
+          ? updates.numberOfGuest.toString()
+          : 'numberOfGuests',
+      },
       ':numberOfNights': { N: updates.numberOfNights.toString() },
       ':modifiedAt': { S: generateDate() },
     },
+
+    ReturnValues: 'UPDATED_NEW',
   });
 
   try {
     const result = await client.send(command);
-    return result;
+    return unmarshall(result.Attributes);
+  } catch (error) {
+    console.log('Error in PutOrderById-db', error.message);
+  }
+};
+
+export const updateNumberOfNights = async (amount, orderId) => {
+  const command = new UpdateItemCommand({
+    TableName: 'bonzai-db',
+    Key: { pk: { S: 'ORDER' }, sk: { S: `ORDER#${orderId}` } },
+    UpdateExpression:
+      'SET #numberOfNights = :numberOfNights, #modifiedAt = :modifiedAt',
+    ExpressionAttributeNames: {
+      '#numberOfNights': 'numberOfNights',
+      '#modifiedAt': 'modifiedAt',
+    },
+    ExpressionAttributeValues: {
+      ':numberOfNights': { N: amount.toString() },
+      ':modifiedAt': { S: generateDate() },
+    },
+
+    ReturnValues: 'UPDATED_NEW',
+  });
+
+  try {
+    const result = await client.send(command);
+    return unmarshall(result.Attributes);
+  } catch (error) {
+    console.log('Error in PutOrderById-db', error.message);
+  }
+};
+export const updateNumberOfGuests = async (amount, orderId) => {
+  const command = new UpdateItemCommand({
+    TableName: 'bonzai-db',
+    Key: { pk: { S: 'ORDER' }, sk: { S: `ORDER#${orderId}` } },
+    UpdateExpression:
+      'SET #numberOfGuests = :numberOfGuests, #modifiedAt = :modifiedAt',
+    ExpressionAttributeNames: {
+      '#numberOfGuests': 'numberOfGuests',
+      '#modifiedAt': 'modifiedAt',
+    },
+    ExpressionAttributeValues: {
+      ':numberOfGuests': { N: amount.toString() },
+      ':modifiedAt': { S: generateDate() },
+    },
+
+    ReturnValues: 'UPDATED_NEW',
+  });
+
+  try {
+    const result = await client.send(command);
+    return unmarshall(result.Attributes);
   } catch (error) {
     console.log('Error in PutOrderById-db', error.message);
   }
