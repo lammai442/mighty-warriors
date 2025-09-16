@@ -34,6 +34,12 @@ functions:
       - httpApi:
           path: /api/orders
           method: GET
+  PutOrderById:
+    handler: functions/PutOrderById/index.handler
+    events:
+      - httpApi:
+          path: /api/orders/{orderId}
+          method: PUT
 
 resources:
   Resources:

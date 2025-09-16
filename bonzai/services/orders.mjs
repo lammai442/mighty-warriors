@@ -1,6 +1,7 @@
 import { client } from './client.mjs';
-import { QueryCommand } from '@aws-sdk/client-dynamodb';
+import { QueryCommand, UpdateItemCommand } from '@aws-sdk/client-dynamodb';
 import { unmarshall } from '@aws-sdk/util-dynamodb';
+import { generateDate } from '../utils/generateDate.mjs';
 export const getAllOrders = async () => {
   const command = new QueryCommand({
     TableName: 'bonzai-db',
@@ -40,5 +41,32 @@ export const getOneOrder = async (orderId) => {
   } catch (error) {
     console.log('ERROR in orders-db', error.message);
     return false;
+  }
+};
+
+export const editOrder = async (updates, orderId) => {
+  const command = new UpdateItemCommand({
+    TableName: 'bonzai-db',
+    Key: { pk: { S: 'ORDER' }, sk: { S: `ORDER#${orderId}` } },
+    UpdateExpression:
+      'SET #numberOfGuests = :numberOfGuests, #numberOfNights = :numberOfNights, #modifiedAt = :modifiedAt, #hiredRooms = :hiredRooms',
+    ExpressionAttributeNames: {
+      '#numberOfGuests': 'numberOfGuests',
+      '#numberOfNights': 'numberOfNights',
+      '#modifiedAt': 'modifiedAt',
+      '#hiredRooms': 'hiredRooms',
+    },
+    ExpressionAttributeValues: {
+      ':numberOfGuests': { N: updates.numberOfGuests.toString() },
+      ':numberOfNights': { N: updates.numberOfNights.toString() },
+      ':modifiedAt': { S: generateDate() },
+    },
+  });
+
+  try {
+    const result = await client.send(command);
+    return result;
+  } catch (error) {
+    console.log('Error in PutOrderById-db', error.message);
   }
 };
