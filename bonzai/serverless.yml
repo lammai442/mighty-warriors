@@ -28,6 +28,12 @@ functions:
       - httpApi:
           path: /api/orders/{orderId}
           method: DELETE
+  PostOrder:
+    handler: functions/PostOrder/index.handler
+    events:
+      - httpApi:
+          path: /api/orders
+          method: POST
   GetOrderById:
     handler: functions/GetOrderById/index.handler
     events:
