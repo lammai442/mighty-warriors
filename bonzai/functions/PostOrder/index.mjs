@@ -4,6 +4,8 @@ import { errorHandler } from '../../middelwares/errorHandler.mjs';
 import httpJsonBodyParser from '@middy/http-json-body-parser';
 import { validateOrder } from '../../middelwares/validateOrder.mjs';
 import { getAllRooms } from '../../services/rooms.mjs';
+import { createOrder } from '../../services/orders.mjs';
+import { toggleAvailableRoom } from '../../services/rooms.mjs';
 
 export const handler = middy(async (event) => {
   const orderRequest = event.body;
@@ -13,7 +15,8 @@ export const handler = middy(async (event) => {
 
   // Loopar igenom alla rumsID som skickas med i body
   for (const roomId of orderRequest.rooms) {
-    // Letar upp det efterfrågade rummet
+    // Letar upp det efterfrågade rummet (i varje loop)
+    // Inte bara true/false utan hela rummet
     const room = allRooms.find((r) => r.sk.includes(roomId));
 
     // Om rummet inte finns så returneras 404
@@ -38,9 +41,11 @@ export const handler = middy(async (event) => {
 
   // Kontroll att det inte är fler gäster än sängar
   let numberOfBeds = 0;
+  let price = 0;
 
   orderRooms.forEach((room) => {
     numberOfBeds += room.beds;
+    price += room.price;
   });
 
   if (orderRequest.guests > numberOfBeds) {
@@ -51,14 +56,25 @@ export const handler = middy(async (event) => {
 
   // ----- -----
 
-  // Adjust the rooms' availability "true/false"
+  // Byter ut .rooms mot de rum som hämtades innan
+  // All annan data som behövs finns annars redan i orderRequest
+  orderRequest.rooms = orderRooms;
+  orderRequest.price = price;
 
-  // Create a new order with unique orderId
+  // Skapar ordern
+  const result = await createOrder(orderRequest);
 
-  return sendResponses(201, {
-    message: 'Successfully created order',
-    orderRooms,
-  });
+  if (result) {
+    // Om vi lyckats skapa en order så ändras "available" på rummen till false.
+    for (const room of orderRequest.rooms) {
+      await toggleAvailableRoom(room.sk, false);
+    }
+
+    return sendResponses(201, {
+      message: 'Successfully created order',
+      orderRooms,
+    });
+  }
 })
   .use(httpJsonBodyParser())
   .use(validateOrder())

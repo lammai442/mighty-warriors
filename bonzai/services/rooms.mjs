@@ -1,5 +1,9 @@
 import { client } from './client.mjs';
-import { PutItemCommand, QueryCommand } from '@aws-sdk/client-dynamodb';
+import {
+  PutItemCommand,
+  QueryCommand,
+  UpdateItemCommand,
+} from '@aws-sdk/client-dynamodb';
 import { generateId } from '../utils/generateId.mjs';
 import { unmarshall } from '@aws-sdk/util-dynamodb';
 
@@ -64,6 +68,46 @@ export const getAvailableRooms = async () => {
     const { Items } = await client.send(command);
     const rooms = Items.map((item) => unmarshall(item));
     return rooms;
+  } catch (error) {
+    console.log('ERROR in db', error.message);
+    return false;
+  }
+};
+
+export const getRoomById = async (roomID) => {
+  const command = new GetItemCommand({
+    TableName: 'bonzai-db',
+    Key: {
+      pk: { S: 'ROOM' },
+      sk: { S: roomID },
+    },
+  });
+
+  try {
+    const { Item } = await client.send(command);
+    return unmarshall(Item);
+  } catch (error) {
+    console.log('ERROR in db', error.message);
+    return false;
+  }
+};
+
+export const toggleAvailableRoom = async (roomID, newValue) => {
+  const command = new UpdateItemCommand({
+    TableName: 'bonzai-db',
+    Key: {
+      pk: { S: 'ROOM' },
+      sk: { S: roomID },
+    },
+    UpdateExpression: 'SET #available = :toggled',
+    ExpressionAttributeNames: { '#available': 'available' },
+    ExpressionAttributeValues: { ':toggled': { BOOL: newValue } },
+    ReturnValues: 'UPDATED_NEW',
+  });
+
+  try {
+    const result = await client.send(command);
+    return unmarshall(result.Attributes);
   } catch (error) {
     console.log('ERROR in db', error.message);
     return false;
