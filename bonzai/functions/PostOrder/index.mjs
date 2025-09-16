@@ -36,7 +36,20 @@ export const handler = middy(async (event) => {
 
   // ----- -----
 
-  // Verification against number of guests versus number of beds
+  // Kontroll att det inte är fler gäster än sängar
+  let numberOfBeds = 0;
+
+  orderRooms.forEach((room) => {
+    numberOfBeds += room.beds;
+  });
+
+  if (orderRequest.guests > numberOfBeds) {
+    return sendResponses(400, {
+      message: `Can't order rooms with fewer beds than there are guests.`,
+    });
+  }
+
+  // ----- -----
 
   // Adjust the rooms' availability "true/false"
 
