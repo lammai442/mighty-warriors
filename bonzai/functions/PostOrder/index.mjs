@@ -6,6 +6,7 @@ import { validateOrder } from '../../middelwares/validateOrder.mjs';
 import { getAllRooms } from '../../services/rooms.mjs';
 import { createOrder } from '../../services/orders.mjs';
 import { toggleAvailableRoom } from '../../services/rooms.mjs';
+import { generateId } from '../../utils/generateId.mjs';
 
 export const handler = middy(async (event) => {
   const orderRequest = event.body;
@@ -63,6 +64,7 @@ export const handler = middy(async (event) => {
   // All annan data som behövs finns annars redan i orderRequest
   orderRequest.rooms = orderRooms;
   orderRequest.price = price;
+  orderRequest.orderId = generateId('ORDER');
 
   // Skapar ordern
   const result = await createOrder(orderRequest);
@@ -76,6 +78,7 @@ export const handler = middy(async (event) => {
     return sendResponses(201, {
       success: true,
       message: 'Successfully created order',
+      orderId: orderRequest.orderId,
       orderRooms,
     });
   } else {
