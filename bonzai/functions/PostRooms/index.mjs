@@ -11,7 +11,7 @@ export const handler = middy(async (event) => {
   if (result) {
     return sendResponses(201, {
       success: true,
-      message: 'Room added successfylly',
+      message: 'Room added successfully',
     });
   } else {
     return sendResponses(400, {
