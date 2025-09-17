@@ -74,7 +74,7 @@ export const createOrder = async (orderRequest) => {
   // Bestämmer vad objektet man vill skicka in ska innehålla
   const order = {
     pk: 'ORDER',
-    sk: generateId('ORDER'),
+    sk: orderRequest.orderId,
     numberOfNights: orderRequest.nights,
     numberOfGuests: orderRequest.guests,
     bookedBy: orderRequest.name,
