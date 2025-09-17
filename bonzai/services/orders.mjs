@@ -90,9 +90,14 @@ export const createOrder = async (orderRequest) => {
     Item: marshall(order),
   };
 
-  // Bara att skicka in params efteråt
-  const result = await client.send(new PutItemCommand(params));
-  return result;
+  try {
+    // Bara att skicka in params efteråt
+    const result = await client.send(new PutItemCommand(params));
+    return result;
+  } catch (error) {
+    console.log('ERROR in db', error.message);
+    return false;
+  }
 };
 
 export const deleteOrder = async (orderId) => {

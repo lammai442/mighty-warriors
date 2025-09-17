@@ -22,12 +22,14 @@ export const handler = middy(async (event) => {
     // Om rummet inte finns så returneras 404
     if (room === undefined) {
       return sendResponses(404, {
+        success: false,
         message: `Room with ID: ${roomId} doesn't exist`,
       });
 
       // Om rummet finns men är otillgängligt
     } else if (room.available === false) {
       return sendResponses(503, {
+        success: false,
         message: `Room with ID: ${roomId} is unavailable`,
       });
 
@@ -50,6 +52,7 @@ export const handler = middy(async (event) => {
 
   if (orderRequest.guests > numberOfBeds) {
     return sendResponses(400, {
+      success: false,
       message: `Can't order rooms with fewer beds than there are guests.`,
     });
   }
@@ -71,8 +74,14 @@ export const handler = middy(async (event) => {
     }
 
     return sendResponses(201, {
+      success: true,
       message: 'Successfully created order',
       orderRooms,
+    });
+  } else {
+    return sendResponses(500, {
+      success: false,
+      message: 'Server error. Order could not be created',
     });
   }
 })
