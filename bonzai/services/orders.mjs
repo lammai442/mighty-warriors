@@ -9,6 +9,7 @@ import {
 import { unmarshall, marshall } from '@aws-sdk/util-dynamodb';
 import { generateDate } from '../utils/generateDate.mjs';
 import { generateId } from '../utils/generateId.mjs';
+
 export const getAllOrders = async () => {
   const command = new QueryCommand({
     TableName: 'bonzai-db',
@@ -94,6 +95,25 @@ export const createOrder = async (orderRequest) => {
   return result;
 };
 
+export const deleteOrder = async (orderId) => {
+  const command = new DeleteItemCommand({
+    TableName: 'bonzai-db',
+    Key: {
+      pk: { S: 'ORDER' },
+      sk: { S: `ORDER#${orderId}` },
+    },
+    ReturnValues: 'ALL_OLD',
+  });
+
+  try {
+    const result = await client.send(command);
+    return result;
+  } catch (error) {
+    console.log('ERROR in db', error.message);
+    return false;
+  }
+};
+
 export const editOrder = async (updates, orderId) => {
   const command = new UpdateItemCommand({
     TableName: 'bonzai-db',
@@ -117,30 +137,12 @@ export const editOrder = async (updates, orderId) => {
     },
 
     ReturnValues: 'UPDATED_NEW',
-  })
-    try {
+  });
+  try {
     const result = await client.send(command);
     return unmarshall(result.Attributes);
   } catch (error) {
     console.log('Error in PutOrderById-db', error.message);
-  }
-
-export const deleteOrder = async (orderId) => {
-  const command = new DeleteItemCommand({
-    TableName: 'bonzai-db',
-    Key: {
-      pk: { S: 'ORDER' },
-      sk: { S: `ORDER#${orderId}` },
-    },
-    ReturnValues: 'ALL_OLD',
-  });
-
-  try {
-    const result = await client.send(command);
-    return result;
-  } catch (error) {
-    console.log('ERROR in db', error.message);
-    return false;
   }
 };
 
@@ -194,4 +196,4 @@ export const updateNumberOfGuests = async (amount, orderId) => {
     console.log('Error in PutOrderById-db', error.message);
     return false;
   }
-}
+};

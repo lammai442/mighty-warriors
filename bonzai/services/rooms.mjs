@@ -4,7 +4,6 @@ import {
   QueryCommand,
   GetItemCommand,
   UpdateItemCommand,
-  GetItemCommand,
 } from '@aws-sdk/client-dynamodb';
 import { generateId } from '../utils/generateId.mjs';
 import { unmarshall } from '@aws-sdk/util-dynamodb';
