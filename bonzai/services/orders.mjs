@@ -6,7 +6,6 @@ import {
   DeleteItemCommand,
 } from '@aws-sdk/client-dynamodb';
 import { unmarshall, marshall } from '@aws-sdk/util-dynamodb';
-import { generateId } from '../utils/generateId.mjs';
 import { generateDate } from '../utils/generateDate.mjs';
 
 export const getAllOrders = async () => {
@@ -73,7 +72,7 @@ export const createOrder = async (orderRequest) => {
   // Bestämmer vad objektet man vill skicka in ska innehålla
   const order = {
     pk: 'ORDER',
-    sk: generateId('ORDER'),
+    sk: orderRequest.orderId,
     numberOfNights: orderRequest.nights,
     numberOfGuests: orderRequest.guests,
     bookedBy: orderRequest.name,
