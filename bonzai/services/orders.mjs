@@ -148,9 +148,22 @@ export const updateOrder = async (updatedOrder, orderId) => {
   });
   try {
     const result = await client.send(command);
-    return result;
+    return unmarshall(result.Attributes);
   } catch (error) {
     console.log('Error in updateOrder-db', error.message);
     throw error;
   }
 };
+
+[
+  {
+    M: {
+      available: { BOOL: true },
+      sk: { S: 'ROOM#DOUBLE#6f587' },
+      createdAt: { S: '2025-09-15T13:05:17.185Z' },
+      pk: { S: 'ROOM' },
+      beds: { N: '2' },
+      price: { N: '1000' },
+    },
+  },
+];
