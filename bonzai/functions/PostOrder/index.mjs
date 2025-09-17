@@ -6,6 +6,7 @@ import { validateOrder } from '../../middelwares/validateOrder.mjs';
 import { getAllRooms } from '../../services/rooms.mjs';
 import { createOrder } from '../../services/orders.mjs';
 import { toggleAvailableRoom } from '../../services/rooms.mjs';
+import { generateId } from '../../utils/generateId.mjs';
 
 export const handler = middy(async (event) => {
   const orderRequest = event.body;
@@ -22,12 +23,14 @@ export const handler = middy(async (event) => {
     // Om rummet inte finns så returneras 404
     if (room === undefined) {
       return sendResponses(404, {
+        success: false,
         message: `Room with ID: ${roomId} doesn't exist`,
       });
 
       // Om rummet finns men är otillgängligt
     } else if (room.available === false) {
       return sendResponses(503, {
+        success: false,
         message: `Room with ID: ${roomId} is unavailable`,
       });
 
@@ -50,6 +53,7 @@ export const handler = middy(async (event) => {
 
   if (orderRequest.guests > numberOfBeds) {
     return sendResponses(400, {
+      success: false,
       message: `Can't order rooms with fewer beds than there are guests.`,
     });
   }
@@ -60,6 +64,7 @@ export const handler = middy(async (event) => {
   // All annan data som behövs finns annars redan i orderRequest
   orderRequest.rooms = orderRooms;
   orderRequest.price = price;
+  orderRequest.orderId = generateId('ORDER');
 
   // Skapar ordern
   const result = await createOrder(orderRequest);
@@ -71,8 +76,15 @@ export const handler = middy(async (event) => {
     }
 
     return sendResponses(201, {
+      success: true,
       message: 'Successfully created order',
+      orderId: orderRequest.orderId,
       orderRooms,
+    });
+  } else {
+    return sendResponses(500, {
+      success: false,
+      message: 'Server error. Order could not be created',
     });
   }
 })
