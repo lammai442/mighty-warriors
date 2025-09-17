@@ -3,6 +3,8 @@ import {
   QueryCommand,
   UpdateItemCommand,
   PutItemCommand,
+  GetItemCommand,
+  DeleteItemCommand,
 } from '@aws-sdk/client-dynamodb';
 import { unmarshall, marshall } from '@aws-sdk/util-dynamodb';
 import { generateDate } from '../utils/generateDate.mjs';
@@ -29,22 +31,40 @@ export const getAllOrders = async () => {
   }
 };
 
-export const getOneOrder = async (orderId) => {
-  const command = new QueryCommand({
+// export const getOneOrder = async (orderId) => {
+//   const command = new QueryCommand({
+//     TableName: 'bonzai-db',
+//     KeyConditionExpression: 'pk= :pk AND begins_with(sk, :sk)',
+//     ExpressionAttributeValues: {
+//       ':pk': { S: 'ORDER' },
+//       ':sk': { S: `ORDER#${orderId}` },
+//     },
+//   });
+
+//   try {
+//     const { Items } = await client.send(command);
+//     const orders = Items.map((item) => unmarshall(item));
+//     return orders;
+//   } catch (error) {
+//     console.log('ERROR in orders-db', error.message);
+//     return false;
+//   }
+// };
+
+export const getOrderById = async (orderId) => {
+  const command = new GetItemCommand({
     TableName: 'bonzai-db',
-    KeyConditionExpression: 'pk= :pk AND begins_with(sk, :sk)',
-    ExpressionAttributeValues: {
-      ':pk': { S: 'ORDER' },
-      ':sk': { S: `ORDER#${orderId}` },
+    Key: {
+      pk: { S: 'ORDER' },
+      sk: { S: `ORDER#${orderId}` },
     },
   });
 
   try {
-    const { Items } = await client.send(command);
-    const orders = Items.map((item) => unmarshall(item));
-    return orders;
+    const { Item } = await client.send(command);
+    return unmarshall(Item);
   } catch (error) {
-    console.log('ERROR in orders-db', error.message);
+    console.log('ERROR in db', error.message);
     return false;
   }
 };
@@ -97,13 +117,30 @@ export const editOrder = async (updates, orderId) => {
     },
 
     ReturnValues: 'UPDATED_NEW',
-  });
-
-  try {
+  })
+    try {
     const result = await client.send(command);
     return unmarshall(result.Attributes);
   } catch (error) {
     console.log('Error in PutOrderById-db', error.message);
+  }
+
+export const deleteOrder = async (orderId) => {
+  const command = new DeleteItemCommand({
+    TableName: 'bonzai-db',
+    Key: {
+      pk: { S: 'ORDER' },
+      sk: { S: `ORDER#${orderId}` },
+    },
+    ReturnValues: 'ALL_OLD',
+  });
+
+  try {
+    const result = await client.send(command);
+    return result;
+  } catch (error) {
+    console.log('ERROR in db', error.message);
+    return false;
   }
 };
 
@@ -155,5 +192,6 @@ export const updateNumberOfGuests = async (amount, orderId) => {
     return unmarshall(result.Attributes);
   } catch (error) {
     console.log('Error in PutOrderById-db', error.message);
+    return false;
   }
-};
+}
