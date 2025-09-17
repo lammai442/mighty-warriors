@@ -2,20 +2,14 @@ import middy from '@middy/core';
 import { sendResponses } from '../../responses/index.mjs';
 import { errorHandler } from '../../middelwares/errorHandler.mjs';
 import { validateOrderId } from '../../middelwares/validateOrderId.mjs';
-import {
-  updateOrder,
-  updateNumberOfNights,
-  getOrderById,
-  updateNumberOfGuests,
-} from '../../services/orders.mjs';
+import { updateOrder, getOrderById } from '../../services/orders.mjs';
 import httpJsonBodyParser from '@middy/http-json-body-parser';
-import { getAllRooms } from '../../services/rooms.mjs';
+import { getAllRooms, getRoomById } from '../../services/rooms.mjs';
+import { validatePutOrderById } from '../../middelwares/validatePutOrderById.mjs';
 export const handler = middy(async (event) => {
   const { orderId } = event.pathParameters || {};
   let currentOrder = await getOrderById(orderId);
   const updateReq = event.body;
-
-  let updatedOrder = {};
 
   if (orderId) {
     // Hämtar hem alla rum
@@ -46,29 +40,24 @@ export const handler = middy(async (event) => {
           message: 'Choice of new room is not available',
         });
       }
+
       // Här läggs de nuvarande rum som finns i ordern
-      let rooms = currentOrder.roomsBooked
-        .filter((r) => r.sk !== updateReq.changeRoomId)
-        .map((r) => r.sk);
+      currentOrder.roomsBooked = currentOrder.roomsBooked.filter(
+        (r) => r.sk !== updateReq.changeRoomId
+      );
       // Lägger till det nya rummet i listan
-      rooms.push(updateReq.newRoomId);
-      // Lägger in arrayen i updateOrder som senare ska skickas in till client
-      updatedOrder = { ...updatedOrder, rooms };
+      let newRoom = await getRoomById(updateReq.newRoomId);
+      currentOrder.roomsBooked.push(newRoom);
     }
 
     if (updateReq.guests) {
       // Kontroll att det inte är fler gäster än sängar
       let numberOfBeds = 0;
       let price = 0;
-      const roomsToCheck =
-        updatedOrder.rooms || currentOrder.roomsBooked.map((r) => r.sk);
 
-      roomsToCheck.forEach((roomId) => {
-        const room = allRooms.find((r) => r.sk === roomId);
-        if (room) {
-          numberOfBeds += room.beds;
-          price += room.price;
-        }
+      currentOrder.roomsBooked.forEach((room) => {
+        numberOfBeds += room.beds;
+        price += room.price;
       });
 
       if (updateReq.guests > numberOfBeds) {
@@ -77,20 +66,20 @@ export const handler = middy(async (event) => {
           message: `Can't order rooms with fewer beds than there are guests.`,
         });
       } else {
-        updatedOrder.guests = updateReq.guests;
-        updatedOrder.price = price;
+        currentOrder.numberOfGuests = updateReq.guests;
+        currentOrder.price = price;
       }
     }
 
-    if (updateReq.nights) updatedOrder.nights = updateReq.nights;
+    if (updateReq.nights) currentOrder.numberOfNights = updateReq.nights;
 
-    // const result = await updateOrder(updatedOrder, orderId);
-
-    return sendResponses(200, {
-      success: true,
-      updatedOrder: updatedOrder,
-      currentOrder: currentOrder,
-    });
+    const result = await updateOrder(currentOrder, orderId);
+    if (result) {
+      return sendResponses(200, {
+        success: true,
+        updatedOrder: result,
+      });
+    }
   } else {
     return sendResponses(400, {
       success: false,
@@ -100,6 +89,7 @@ export const handler = middy(async (event) => {
 })
   .use(httpJsonBodyParser())
   .use(validateOrderId())
+  .use(validatePutOrderById())
   .use(errorHandler());
 
 // Som en gäst vill jag kunna ändra min bokning ifall mina planer ändras.
@@ -117,26 +107,3 @@ export const handler = middy(async (event) => {
 // Eventuellt extra att göra:
 
 // Toggla "available = true/false" för rummen
-
-[
-  {
-    M: {
-      available: { BOOL: true },
-      sk: { S: 'ROOM#DOUBLE#0d01f' },
-      createdAt: { S: '2025-09-15T13:05:18.537Z' },
-      pk: { S: 'ROOM' },
-      beds: { N: '2' },
-      price: { N: '1000' },
-    },
-  },
-  {
-    M: {
-      available: { BOOL: true },
-      sk: { S: 'ROOM#DOUBLE#7a8c6' },
-      createdAt: { S: '2025-09-15T13:05:15.482Z' },
-      pk: { S: 'ROOM' },
-      beds: { N: '2' },
-      price: { N: '1000' },
-    },
-  },
-];

@@ -119,140 +119,38 @@ export const deleteOrder = async (orderId) => {
   }
 };
 
-// export const updateOrder = async (updates, orderId) => {
-//   const command = new UpdateItemCommand({
-//     TableName: 'bonzai-db',
-//     Key: { pk: { S: 'ORDER' }, sk: { S: `ORDER#${orderId}` } },
-//     UpdateExpression:
-//       'SET #numberOfGuests = :numberOfGuests, #numberOfNights = :numberOfNights, #modifiedAt = :modifiedAt, #roomsBooked = :roomsBooked',
-//     ExpressionAttributeNames: {
-//       '#numberOfGuests': 'numberOfGuests',
-//       '#numberOfNights': 'numberOfNights',
-//       '#modifiedAt': 'modifiedAt',
-//       '#roomsBooked': 'roomsBooked'
-//     },
-//     ExpressionAttributeValues: {
-//       ':numberOfGuests': {
-//         N: updates.numberOfGuests
-//           ? updates.numberOfGuest.toString()
-//           : 'numberOfGuests',
-//       },
-//       ':numberOfNights': { N: updates.numberOfNights.toString() },
-//       ':modifiedAt': { S: generateDate() },
-//       ':roomsBooked':
-//     },
-
-//     ReturnValues: 'UPDATED_NEW',
-//   });
-//   try {
-//     const result = await client.send(command);
-//     return unmarshall(result.Attributes);
-//   } catch (error) {
-//     console.log('Error in PutOrderById-db', error.message);
-//   }
-// };
-
-export const updateOrder = async (updates, orderId) => {
-  // Dynamiskt bygg ExpressionAttributes och UpdateExpression
-  const ExpressionAttributeNames = {};
-  const ExpressionAttributeValues = {};
-  const setExpressions = [];
-
-  if (updates.numberOfGuests !== undefined) {
-    ExpressionAttributeNames['#numberOfGuests'] = 'numberOfGuests';
-    ExpressionAttributeValues[':numberOfGuests'] = {
-      N: updates.guests.toString(),
-    };
-    setExpressions.push('#numberOfGuests = :numberOfGuests');
-  }
-
-  if (updates.numberOfNights !== undefined) {
-    ExpressionAttributeNames['#numberOfNights'] = 'numberOfNights';
-    ExpressionAttributeValues[':numberOfNights'] = {
-      N: updates.nights.toString(),
-    };
-    setExpressions.push('#numberOfNights = :numberOfNights');
-  }
-
-  if (updates.roomsBooked !== undefined) {
-    ExpressionAttributeNames['#roomsBooked'] = 'roomsBooked';
-    ExpressionAttributeValues[':roomsBooked'] = {
-      L: updates.rooms.map((r) => ({ S: r })),
-    };
-    setExpressions.push('#roomsBooked = :roomsBooked');
-  }
-
-  // alltid uppdatera modifiedAt
-  ExpressionAttributeNames['#modifiedAt'] = 'modifiedAt';
-  ExpressionAttributeValues[':modifiedAt'] = { S: generateDate() };
-  setExpressions.push('#modifiedAt = :modifiedAt');
-
+export const updateOrder = async (updatedOrder, orderId) => {
   const command = new UpdateItemCommand({
     TableName: 'bonzai-db',
-    Key: { pk: { S: 'ORDER' }, sk: { S: `ORDER#${orderId}` } },
-    UpdateExpression: `SET ${setExpressions.join(', ')}`,
-    ExpressionAttributeNames,
-    ExpressionAttributeValues,
+    Key: {
+      pk: { S: 'ORDER' },
+      sk: { S: `ORDER#${orderId}` },
+    },
+    UpdateExpression:
+      'SET #nights = :nights, #guests = :guests, #price = :price, #rooms = :rooms, #modifiedAt = :modifiedAt',
+    ExpressionAttributeNames: {
+      '#nights': 'numberOfNights',
+      '#guests': 'numberOfGuests',
+      '#price': 'price',
+      '#rooms': 'roomsBooked',
+      '#modifiedAt': 'modifiedAt',
+    },
+    ExpressionAttributeValues: {
+      ':nights': { N: updatedOrder.numberOfNights.toString() },
+      ':guests': { N: updatedOrder.numberOfGuests.toString() },
+      ':price': { N: updatedOrder.price.toString() },
+      ':rooms': {
+        L: updatedOrder.roomsBooked.map((r) => ({ M: marshall(r) })),
+      },
+      ':modifiedAt': { S: generateDate() },
+    },
     ReturnValues: 'UPDATED_NEW',
   });
-
   try {
     const result = await client.send(command);
-    return unmarshall(result.Attributes);
+    return result;
   } catch (error) {
     console.log('Error in updateOrder-db', error.message);
     throw error;
-  }
-};
-
-export const updateNumberOfNights = async (amount, orderId) => {
-  const command = new UpdateItemCommand({
-    TableName: 'bonzai-db',
-    Key: { pk: { S: 'ORDER' }, sk: { S: `ORDER#${orderId}` } },
-    UpdateExpression:
-      'SET #numberOfNights = :numberOfNights, #modifiedAt = :modifiedAt',
-    ExpressionAttributeNames: {
-      '#numberOfNights': 'numberOfNights',
-      '#modifiedAt': 'modifiedAt',
-    },
-    ExpressionAttributeValues: {
-      ':numberOfNights': { N: amount.toString() },
-      ':modifiedAt': { S: generateDate() },
-    },
-
-    ReturnValues: 'UPDATED_NEW',
-  });
-
-  try {
-    const result = await client.send(command);
-    return unmarshall(result.Attributes);
-  } catch (error) {
-    console.log('Error in PutOrderById-db', error.message);
-  }
-};
-export const updateNumberOfGuests = async (amount, orderId) => {
-  const command = new UpdateItemCommand({
-    TableName: 'bonzai-db',
-    Key: { pk: { S: 'ORDER' }, sk: { S: `ORDER#${orderId}` } },
-    UpdateExpression:
-      'SET #numberOfGuests = :numberOfGuests, #modifiedAt = :modifiedAt',
-    ExpressionAttributeNames: {
-      '#numberOfGuests': 'numberOfGuests',
-      '#modifiedAt': 'modifiedAt',
-    },
-    ExpressionAttributeValues: {
-      ':numberOfGuests': { N: amount.toString() },
-      ':modifiedAt': { S: generateDate() },
-    },
-
-    ReturnValues: 'UPDATED_NEW',
-  });
-
-  try {
-    const result = await client.send(command);
-    return unmarshall(result.Attributes);
-  } catch (error) {
-    console.log('Error in PutOrderById-db', error.message);
-    return false;
   }
 };
