@@ -1,69 +1,345 @@
-<!--
-title: 'AWS Simple HTTP Endpoint example in NodeJS'
-description: 'This template demonstrates how to make a simple HTTP API with Node.js running on AWS Lambda and API Gateway using the Serverless Framework.'
-layout: Doc
-framework: v4
-platform: AWS
-language: nodeJS
-authorLink: 'https://github.com/serverless'
-authorName: 'Serverless, Inc.'
-authorAvatar: 'https://avatars1.githubusercontent.com/u/13742415?s=200&v=4'
--->
+# Dokumentation Bonzai API Mighty Warrios
 
-# Serverless Framework Node HTTP API on AWS
+Dokumentationen nedan innehåller en beskrivning av innehållet i databasen samt tillhörande API-anrop.
+URL: [https://tjlw7gjfve.execute-api.eu-north-1.amazonaws.com](https://tjlw7gjfve.execute-api.eu-north-1.amazonaws.com)
 
-This template demonstrates how to make a simple HTTP API with Node.js running on AWS Lambda and API Gateway using the Serverless Framework.
+## Dokument i databasen
 
-This template does not include any kind of persistence (database). For more advanced examples, check out the [serverless/examples repository](https://github.com/serverless/examples/) which includes Typescript, Mongo, DynamoDB and other examples.
+### Room
 
-## Usage
+sk: alla rum börjar med ROOM#. Därefter följer rumstypen, SINGLE, DOUBLE eller SUITE. sk:n avslutas med en slumpmässig sträng som innehåller 5 tecken, versaler, gemener och 0-9. I exemplet nedan visas ett dubbelrum.
 
-### Deployment
+#### Exempel
 
-In order to deploy the example, you need to run the following command:
+    {
+    		"createdAt": "2025-09-17T07:44:07.561Z",
+    		"available": true,
+    		"pk": "ROOM",
+    		"price": 1500,
+    		"beds": 1,
+    		"sk": "ROOM#DOUBLE#16149"
+    	},
 
-```
-serverless deploy
-```
+### Order
 
-After running deploy, you should see output similar to:
+Exempel på en order med två bokade rum.
 
-```
-Deploying "serverless-http-api" to stage "dev" (us-east-1)
+#### Exempel:
 
-✔ Service deployed to stack serverless-http-api-dev (91s)
+<pre>
+[{
+"numberOfGuests": 3,
+"roomsBooked": [
+{
+"available": true,
+"sk": "ROOM#DOUBLE#7a8c6",
+"createdAt": "2025-09-15T13:05:15.482Z",
+"pk": "ROOM",
+"beds": 2,
+"price": 1000
+},
+{
+"available": true,
+"sk": "ROOM#SINGLE#1cbf5",
+"createdAt": "2025-09-15T13:04:49.493Z",
+"pk": "ROOM",
+"beds": 1,
+"price": 500
+}
+],
+"bookedBy": "User123",
+"createdAt": "2025-09-16T14:42:16.342Z",
+"numberOfNights": 4,
+"price": 1500,
+"pk": "ORDER",
+"sk": "ORDER#f641a"
+}]</pre>
 
-endpoint: GET - https://xxxxxxxxxx.execute-api.us-east-1.amazonaws.com/
-functions:
-  hello: serverless-http-api-dev-hello (1.6 kB)
-```
+## API-anrop
 
-_Note_: In current form, after deployment, your API is public and can be invoked by anyone. For production deployments, you might want to configure an authorizer. For details on how to do that, refer to [HTTP API (API Gateway V2) event docs](https://www.serverless.com/framework/docs/providers/aws/events/http-api).
+### ROOMS
 
-### Invocation
+#### POST Room
 
-After successful deployment, you can call the created application via HTTP:
+Lägger till ett rum i databasen.
 
-```
-curl https://xxxxxxx.execute-api.us-east-1.amazonaws.com/
-```
+#### Exempel:
 
-Which should result in response similar to:
+<pre>
+method: POST
+url: /api/rooms</pre>
+
+##### Body:
 
 ```json
-{ "message": "Go Serverless v4! Your function executed successfully!" }
+{ "available": true, "beds": 1, "price": 1500, "type": "double" }
 ```
 
-### Local development
+##### Response:
 
-The easiest way to develop and test your function is to use the `dev` command:
-
+```json
+{
+  "success": true,
+  "message": "Room added successfully"
+}
 ```
-serverless dev
+
+#### GET all available Rooms
+
+Returnerar alla rum som är tillgängliga för bokning, d.v.s. available: true. I exemplet visas ett rum av varje sort (single, double, suite). I databasen finns totalt 20 rum.
+
+##### Exempel:
+
+<pre>
+method: GET
+url: /api/rooms
+</pre>
+
+##### Body: ingen body
+
+##### Response:
+
+```json
+{
+  "message": "success",
+  "data": [
+    {
+      "createdAt": "2025-09-15T13:05:19.164Z",
+      "available": true,
+      "pk": "ROOM",
+      "price": 1000,
+      "beds": 2,
+      "sk": "ROOM#DOUBLE#5ea73"
+    },
+    {
+      "createdAt": "2025-09-15T13:04:48.577Z",
+      "available": true,
+      "pk": "ROOM",
+      "price": 500,
+      "beds": 1,
+      "sk": "ROOM#SINGLE#2debb"
+    },
+    {
+      "createdAt": "2025-09-15T13:05:52.097Z",
+      "available": true,
+      "pk": "ROOM",
+      "price": 1500,
+      "beds": 3,
+      "sk": "ROOM#SUITE#8e943"
+    }
+  ]
+}
 ```
 
-This will start a local emulator of AWS Lambda and tunnel your requests to and from AWS Lambda, allowing you to interact with your function as if it were running in the cloud.
+### ORDERS
 
-Now you can invoke the function as before, but this time the function will be executed locally. Now you can develop your function locally, invoke it, and see the results immediately without having to re-deploy.
+#### GET Orders
 
-When you are done developing, don't forget to run `serverless deploy` to deploy the function to the cloud.
+Returnerar samtliga ordrar.
+
+##### Exempel:
+
+<pre>
+method: GET
+url: /api/orders
+</pre>
+
+##### Body: ingen body
+
+##### Response:
+
+```json
+{
+  "success": true,
+  "orders": [
+    {
+      "numberOfGuests": 1,
+      "roomsBooked": [
+        {
+          "available": true,
+          "sk": "ROOM#DOUBLE#a8662",
+          "createdAt": "2025-09-16T14:36:47.428Z",
+          "pk": "ROOM",
+          "beds": 1,
+          "price": 1500
+        }
+      ],
+      "bookedBy": "Klara",
+      "createdAt": "2025-09-17T07:33:10.070Z",
+      "numberOfNights": 1,
+      "price": 1500,
+      "pk": "ORDER",
+      "sk": "ORDER#29c35"
+    },
+    {
+      "numberOfGuests": 3,
+      "roomsBooked": [
+        {
+          "available": true,
+          "sk": "ROOM#DOUBLE#5ea73",
+          "createdAt": "2025-09-15T13:05:19.164Z",
+          "pk": "ROOM",
+          "beds": 2,
+          "price": 1000
+        },
+        {
+          "available": true,
+          "sk": "ROOM#SINGLE#f45c8",
+          "createdAt": "2025-09-15T13:04:44.648Z",
+          "pk": "ROOM",
+          "beds": 1,
+          "price": 500
+        }
+      ],
+      "bookedBy": "Namn Namnsson",
+      "createdAt": "2025-09-17T10:42:52.597Z",
+      "numberOfNights": 1,
+      "price": 1500,
+      "pk": "ORDER",
+      "sk": "ORDER#39382"
+    }
+  ]
+}
+```
+
+#### GET Order by id
+
+Returnerar en specifik order baserat på orderId.
+
+##### Exempel:
+
+<pre>
+method: GET
+url: /api/orders/{orderId} (OBS, endast de 5 sista tecknen i orderId:t ska skickas som parameter)
+</pre>
+
+##### Body: ingen body
+
+##### Response:
+
+```json
+{
+  "success": true,
+  "orders": {
+    "numberOfGuests": 3,
+    "roomsBooked": [
+      {
+        "available": true,
+        "sk": "ROOM#DOUBLE#5ea73",
+        "createdAt": "2025-09-15T13:05:19.164Z",
+        "pk": "ROOM",
+        "beds": 2,
+        "price": 1000
+      },
+      {
+        "available": true,
+        "sk": "ROOM#SINGLE#f45c8",
+        "createdAt": "2025-09-15T13:04:44.648Z",
+        "pk": "ROOM",
+        "beds": 1,
+        "price": 500
+      }
+    ],
+    "bookedBy": "Namn Namnsson",
+    "createdAt": "2025-09-17T10:42:52.597Z",
+    "numberOfNights": 1,
+    "price": 1500,
+    "pk": "ORDER",
+    "sk": "ORDER#39382"
+  }
+}
+```
+
+#### POST Order
+
+Lägger till en order i databasen. Antal gäster får inte överskrida det totala antalet sängar i rummen.
+
+##### Exempel:
+
+<pre>
+method: POST
+url: /api/orders
+</pre>
+
+##### Body:
+
+```json
+{
+  "guests": 3,
+  "rooms": ["ROOM#DOUBLE#16149", "ROOM#SINGLE#2e309"],
+  "nights": 1,
+  "name": "Namn Namnsson",
+  "email": "user@usermail.com"
+}
+```
+
+##### Response:
+
+```json
+{
+  "message": "Successfully created order",
+  "orderRooms": [
+    {
+      "createdAt": "2025-09-15T13:05:19.164Z",
+      "available": true,
+      "pk": "ROOM",
+      "price": 1000,
+      "beds": 2,
+      "sk": "ROOM#DOUBLE#16149"
+    },
+    {
+      "createdAt": "2025-09-15T13:04:44.648Z",
+      "available": true,
+      "pk": "ROOM",
+      "price": 500,
+      "beds": 1,
+      "sk": "ROOM#SINGLE#2e309"
+    }
+  ]
+}
+```
+
+#### PUT Order by id
+
+Uppdaterar en specifik order baserat på id.
+
+##### Exempel:
+
+<pre>
+method: PUT
+url: /api/orders/{orderId} (OBS, endast de 5 sista tecknen i orderId:t ska skickas som parameter)
+</pre>
+
+##### Body:
+
+```json
+// Här ska vi fylla på hur bodyn ser ut
+```
+
+##### Response
+
+```json
+// Här ska vi fylla på hur responset ser ut
+```
+
+#### DELETE Order by id
+
+Hämtar en order baserat på id. Togglar rummen till available: true. Raderar sedan hela ordern.
+
+##### Exempel:
+
+<pre>
+method: DELETE
+url: /api/orders/{orderId} (OBS, endast de 5 sista tecknen i orderId:t ska skickas som parameter)
+</pre>
+
+##### Body: ingen body
+
+##### Response:
+
+```json
+{
+  "success": true,
+  "message": "Order successfully deleted"
+}
+```
