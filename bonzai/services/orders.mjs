@@ -3,6 +3,7 @@ import {
   QueryCommand,
   PutItemCommand,
   GetItemCommand,
+  DeleteItemCommand,
 } from '@aws-sdk/client-dynamodb';
 import { unmarshall, marshall } from '@aws-sdk/util-dynamodb';
 import { generateId } from '../utils/generateId.mjs';
@@ -30,25 +31,25 @@ export const getAllOrders = async () => {
   }
 };
 
-export const getOneOrder = async (orderId) => {
-  const command = new QueryCommand({
-    TableName: 'bonzai-db',
-    KeyConditionExpression: 'pk= :pk AND begins_with(sk, :sk)',
-    ExpressionAttributeValues: {
-      ':pk': { S: 'ORDER' },
-      ':sk': { S: `ORDER#${orderId}` },
-    },
-  });
+// export const getOneOrder = async (orderId) => {
+//   const command = new QueryCommand({
+//     TableName: 'bonzai-db',
+//     KeyConditionExpression: 'pk= :pk AND begins_with(sk, :sk)',
+//     ExpressionAttributeValues: {
+//       ':pk': { S: 'ORDER' },
+//       ':sk': { S: `ORDER#${orderId}` },
+//     },
+//   });
 
-  try {
-    const { Items } = await client.send(command);
-    const orders = Items.map((item) => unmarshall(item));
-    return orders;
-  } catch (error) {
-    console.log('ERROR in orders-db', error.message);
-    return false;
-  }
-};
+//   try {
+//     const { Items } = await client.send(command);
+//     const orders = Items.map((item) => unmarshall(item));
+//     return orders;
+//   } catch (error) {
+//     console.log('ERROR in orders-db', error.message);
+//     return false;
+//   }
+// };
 
 export const getOrderById = async (orderId) => {
   const command = new GetItemCommand({
@@ -91,4 +92,23 @@ export const createOrder = async (orderRequest) => {
   // Bara att skicka in params efteråt
   const result = await client.send(new PutItemCommand(params));
   return result;
+};
+
+export const deleteOrder = async (orderId) => {
+  const command = new DeleteItemCommand({
+    TableName: 'bonzai-db',
+    Key: {
+      pk: { S: 'ORDER' },
+      sk: { S: `ORDER#${orderId}` },
+    },
+    ReturnValues: 'ALL_OLD',
+  });
+
+  try {
+    const result = await client.send(command);
+    return result;
+  } catch (error) {
+    console.log('ERROR in db', error.message);
+    return false;
+  }
 };
