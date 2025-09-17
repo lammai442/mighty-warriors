@@ -12,9 +12,9 @@ export const handler = middy(async (event) => {
   if (result) {
     return sendResponses(200, { success: true, orders: result });
   } else {
-    return sendResponses(400, {
+    return sendResponses(404, {
       success: false,
-      message: 'Could not find order',
+      message: `Could not find order with orderId: ${orderId}`,
     });
   }
 })
