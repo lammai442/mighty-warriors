@@ -301,7 +301,13 @@ url: /api/orders
 
 #### PUT Order by id
 
-Uppdaterar en specifik order baserat på id.
+Uppdaterar en specifik order baserat på id. Innehållet i bodyn beror på vad som ska uppdateras.
+
+- Om endast antal nätter ska uppdateras behöver endast nights skickas med.
+- Samma sak gäller för antal gäster angående nyckelvärdeparet guests.
+- Om användaren vill byta rum ska både det gamla rums-id:t och det nya rums-id:t skickas med.
+
+Antalet gäster måste överensstämma med antalet sängar i ordern.
 
 ##### Exempel:
 
@@ -313,13 +319,36 @@ url: /api/orders/{orderId} (OBS, endast de 5 sista tecknen i orderId:t ska skick
 ##### Body:
 
 ```json
-// Här ska vi fylla på hur bodyn ser ut
+{
+  "removeRoomId": "ROOM#DOUBLE#6f587",
+  "newRoomId": "ROOM#SUITE#d6ab6",
+  "nights": 2,
+  "guests": 2
+}
 ```
 
 ##### Response
 
 ```json
-// Här ska vi fylla på hur responset ser ut
+{
+  "success": true,
+  "updatedOrder": {
+    "numberOfGuests": 2,
+    "modifiedAt": "2025-09-18T12:10:52.503Z",
+    "numberOfNights": 2,
+    "totalPrice": 3000,
+    "roomsBooked": [
+      {
+        "available": true,
+        "sk": "ROOM#SUITE#d6ab6",
+        "createdAt": "2025-09-15T13:05:51.361Z",
+        "pk": "ROOM",
+        "beds": 3,
+        "price": 1500
+      }
+    ]
+  }
+}
 ```
 
 #### DELETE Order by id
