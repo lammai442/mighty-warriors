@@ -76,14 +76,15 @@ export const handler = middy(async (event) => {
       numberOfBeds += room.beds;
     });
 
-    if (updateReq.guests > numberOfBeds) {
+    if (updateReq.numberOfGuests > numberOfBeds) {
       return sendResponses(400, {
         success: false,
         message: `Can't order rooms with fewer beds than there are guests.`,
       });
     }
 
-    if (updateReq.guests) currentOrder.numberOfGuests = updateReq.guests;
+    if (updateReq.numberOfGuests)
+      currentOrder.numberOfGuests = updateReq.numberOfGuests;
 
     if (currentOrder.roomsBooked.length > currentOrder.numberOfGuests) {
       return sendResponses(400, {
@@ -92,8 +93,8 @@ export const handler = middy(async (event) => {
       });
     }
 
-    if (updateReq.nights)
-      currentOrder.numberOfNights = parseInt(updateReq.nights);
+    if (updateReq.numberOfNights)
+      currentOrder.numberOfNights = parseInt(updateReq.numberOfNights);
 
     // Uppdaterar totalsumman för hela ordern
     let totalRoomPrice = 0;
