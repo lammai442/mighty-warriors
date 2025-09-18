@@ -75,11 +75,11 @@ export const createOrder = async (orderRequest) => {
   const order = {
     pk: 'ORDER',
     sk: orderRequest.orderId,
-    numberOfNights: orderRequest.nights,
-    numberOfGuests: orderRequest.guests,
+    numberOfNights: orderRequest.numberOfNights,
+    numberOfGuests: orderRequest.numberOfGuests,
     bookedBy: orderRequest.name,
     // orderRequest.rooms är en array av objekt som innehåller rummen
-    roomsBooked: orderRequest.rooms,
+    roomsBooked: orderRequest.roomsBooked,
     totalPrice: orderRequest.totalPrice,
     createdAt: generateDate(),
   };
