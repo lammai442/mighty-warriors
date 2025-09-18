@@ -87,8 +87,7 @@ export const handler = middy(async (event) => {
     return sendResponses(201, {
       success: true,
       message: 'Successfully created order',
-      orderId: orderRequest.orderId,
-      orderRooms,
+      orderRequest,
     });
   } else {
     return sendResponses(500, {
