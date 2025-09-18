@@ -1,5 +1,3 @@
-import { sendResponses } from '../responses/index.mjs';
-
 export const validateBeds = (currentOrder, reqGuests) => {
   // Kontroll att det inte är fler gäster än sängar
   if (reqGuests) currentOrder.numberOfGuests = reqGuests;
@@ -31,9 +29,4 @@ export const validateRoomId = (allRooms, roomId) => {
     return false;
   }
   return room;
-};
-
-export const validateIsRoomAvailable = (room) => {
-  if (room.available === false) return false;
-  return true;
 };

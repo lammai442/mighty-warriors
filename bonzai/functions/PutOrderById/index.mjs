@@ -8,7 +8,6 @@ import { getAllRooms, toggleAvailableRoom } from '../../services/rooms.mjs';
 import { validatePutOrderById } from '../../middlewares/validatePutOrderById.mjs';
 import {
   validateBeds,
-  validateIsRoomAvailable,
   validateRoomId,
   validateRooms,
 } from '../../utils/validators.mjs';
