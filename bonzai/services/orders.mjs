@@ -8,7 +8,6 @@ import {
 } from '@aws-sdk/client-dynamodb';
 import { unmarshall, marshall } from '@aws-sdk/util-dynamodb';
 import { generateDate } from '../utils/generateDate.mjs';
-import { generateId } from '../utils/generateId.mjs';
 
 export const getAllOrders = async () => {
   const command = new QueryCommand({
@@ -31,26 +30,6 @@ export const getAllOrders = async () => {
     return false;
   }
 };
-
-// export const getOneOrder = async (orderId) => {
-//   const command = new QueryCommand({
-//     TableName: 'bonzai-db',
-//     KeyConditionExpression: 'pk= :pk AND begins_with(sk, :sk)',
-//     ExpressionAttributeValues: {
-//       ':pk': { S: 'ORDER' },
-//       ':sk': { S: `ORDER#${orderId}` },
-//     },
-//   });
-
-//   try {
-//     const { Items } = await client.send(command);
-//     const orders = Items.map((item) => unmarshall(item));
-//     return orders;
-//   } catch (error) {
-//     console.log('ERROR in orders-db', error.message);
-//     return false;
-//   }
-// };
 
 export const getOrderById = async (orderId) => {
   const command = new GetItemCommand({
