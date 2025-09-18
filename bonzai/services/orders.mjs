@@ -78,7 +78,7 @@ export const createOrder = async (orderRequest) => {
     bookedBy: orderRequest.name,
     // orderRequest.rooms är en array av objekt som innehåller rummen
     roomsBooked: orderRequest.rooms,
-    price: orderRequest.price,
+    totalPrice: orderRequest.totalPrice,
     createdAt: generateDate(),
   };
 

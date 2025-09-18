@@ -41,15 +41,23 @@ export const handler = middy(async (event) => {
     }
   }
 
+  if (orderRooms.length > orderRequest.guests) {
+    return sendResponses(400, {
+      success: false,
+      message: `Can't order more rooms than there are guests.`,
+    });
+  }
+
   // ----- -----
 
   // Kontroll att det inte är fler gäster än sängar
+  // Räknar även det totala priset för ordern per natt
   let numberOfBeds = 0;
-  let price = 0;
+  let pricePerNight = 0;
 
   orderRooms.forEach((room) => {
     numberOfBeds += room.beds;
-    price += room.price;
+    pricePerNight += room.price;
   });
 
   if (orderRequest.guests > numberOfBeds) {
@@ -64,7 +72,7 @@ export const handler = middy(async (event) => {
   // Byter ut .rooms mot de rum som hämtades innan
   // All annan data som behövs finns annars redan i orderRequest
   orderRequest.rooms = orderRooms;
-  orderRequest.price = price;
+  orderRequest.totalPrice = pricePerNight * orderRequest.nights;
   orderRequest.orderId = generateId('ORDER');
 
   // Skapar ordern
