@@ -127,18 +127,18 @@ export const updateOrder = async (updatedOrder, orderId) => {
       sk: { S: `ORDER#${orderId}` },
     },
     UpdateExpression:
-      'SET #nights = :nights, #guests = :guests, #price = :price, #rooms = :rooms, #modifiedAt = :modifiedAt',
+      'SET #nights = :nights, #guests = :guests, #totalPrice = :totalPrice, #rooms = :rooms, #modifiedAt = :modifiedAt',
     ExpressionAttributeNames: {
       '#nights': 'numberOfNights',
       '#guests': 'numberOfGuests',
-      '#price': 'price',
+      '#totalPrice': 'totalPrice',
       '#rooms': 'roomsBooked',
       '#modifiedAt': 'modifiedAt',
     },
     ExpressionAttributeValues: {
       ':nights': { N: updatedOrder.numberOfNights.toString() },
       ':guests': { N: updatedOrder.numberOfGuests.toString() },
-      ':price': { N: updatedOrder.price.toString() },
+      ':totalPrice': { N: updatedOrder.totalPrice.toString() },
       ':rooms': {
         L: updatedOrder.roomsBooked.map((r) => ({ M: marshall(r) })),
       },
@@ -154,16 +154,3 @@ export const updateOrder = async (updatedOrder, orderId) => {
     throw error;
   }
 };
-
-[
-  {
-    M: {
-      available: { BOOL: true },
-      sk: { S: 'ROOM#DOUBLE#6f587' },
-      createdAt: { S: '2025-09-15T13:05:17.185Z' },
-      pk: { S: 'ROOM' },
-      beds: { N: '2' },
-      price: { N: '1000' },
-    },
-  },
-];

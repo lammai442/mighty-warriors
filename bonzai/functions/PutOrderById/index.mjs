@@ -4,11 +4,7 @@ import { errorHandler } from '../../middelwares/errorHandler.mjs';
 import { validateOrderId } from '../../middelwares/validateOrderId.mjs';
 import { updateOrder, getOrderById } from '../../services/orders.mjs';
 import httpJsonBodyParser from '@middy/http-json-body-parser';
-import {
-  getAllRooms,
-  getRoomById,
-  toggleAvailableRoom,
-} from '../../services/rooms.mjs';
+import { getAllRooms, toggleAvailableRoom } from '../../services/rooms.mjs';
 import { validatePutOrderById } from '../../middelwares/validatePutOrderById.mjs';
 export const handler = middy(async (event) => {
   const { orderId } = event.pathParameters || {};
@@ -40,70 +36,83 @@ export const handler = middy(async (event) => {
           message: 'Choice of new room is not available',
         });
       }
-      // Hämtar hem rumsobjektet och lägger in den i roomsBooked-arr
-      let newRoom = await getRoomById(updateReq.newRoomId);
+      // Hämtar hem objektet i allRooms-arrayen
+      let newRoom = allRooms.find((r) => r.sk === updateReq.newRoomId);
       currentOrder.roomsBooked.push(newRoom);
-
-      // Kontroll att det inte är fler gäster än sängar
-      if (updateReq.guests) {
-        let numberOfBeds = 0;
-
-        currentOrder.roomsBooked.forEach((room) => {
-          numberOfBeds += room.beds;
-        });
-
-        if (updateReq.guests > numberOfBeds) {
-          return sendResponses(400, {
-            success: false,
-            message: `Can't order rooms with fewer beds than there are guests.`,
-          });
-        } else {
-          currentOrder.numberOfGuests = updateReq.guests;
-        }
-      } else {
-        return sendResponses(400, {
-          success: false,
-          message: `You have to put in total of guest for this order`,
-        });
-      }
     }
 
-    if (updateReq.changeRoomId) {
-      // Kontroll om changeRoomId finns med i alla rum
+    // Om användaren skickar med att den vill byta rum från
+    if (updateReq.removeRoomId) {
+      // Kontroll om removeRoomId finns med i alla rum
       const changeRoomExists = currentOrder.roomsBooked.some(
-        (r) => r.sk === updateReq.changeRoomId
+        (r) => r.sk === updateReq.removeRoomId
       );
-      // Om changeRoomId inte finns med i listan av alla rum
+      // Om removeRoomId inte finns med i listan av alla rum
       if (!changeRoomExists) {
         return sendResponses(400, {
           success: false,
-          message: 'ChangeRoomId does not exist in current order',
+          message: 'removeRoomId does not exist in current order',
         });
       }
 
       // Här tas det rum man vill byta bort från roomsBooked-arr
-      currentOrder.roomsBooked = currentOrder.roomsBooked.filter(
-        (r) => r.sk !== updateReq.changeRoomId
+      const updatedRoomsBooked = currentOrder.roomsBooked.filter(
+        (r) => r.sk !== updateReq.removeRoomId
       );
+      if (updatedRoomsBooked.length < 1) {
+        return sendResponses(400, {
+          success: false,
+          message: 'Your order must include a least one room',
+        });
+      }
+      // Ersätter med den nya roomsBooked-arr
+      currentOrder.roomsBooked = updatedRoomsBooked;
     }
 
-    // Om användaren vill ändra antal nätter för hela ordern
-    if (updateReq.nights) {
-      // Uppdaterar totalsumman för hela ordern
-      let totalRoomPrice = 0;
+    // Kontroll att det inte är fler gäster än sängar
+    let numberOfBeds = 0;
 
-      currentOrder.roomsBooked.forEach((room) => {
-        totalRoomPrice += room.price * updateReq.nights;
+    currentOrder.roomsBooked.forEach((room) => {
+      numberOfBeds += room.beds;
+    });
+
+    if (updateReq.guests > numberOfBeds) {
+      return sendResponses(400, {
+        success: false,
+        message: `Can't order rooms with fewer beds than there are guests.`,
       });
-      currentOrder.price = totalRoomPrice;
-      // Ändrar om antal nätter till det nya antalet
-      currentOrder.numberOfNights = updateReq.nights;
     }
 
+    if (updateReq.guests) currentOrder.numberOfGuests = updateReq.guests;
+
+    if (currentOrder.roomsBooked.length > currentOrder.numberOfGuests) {
+      return sendResponses(400, {
+        success: false,
+        message: `Can't order more rooms than there are guests.`,
+      });
+    }
+
+    if (updateReq.nights)
+      currentOrder.numberOfNights = parseInt(updateReq.nights);
+
+    // Uppdaterar totalsumman för hela ordern
+    let totalRoomPrice = 0;
+
+    currentOrder.roomsBooked.forEach((room) => {
+      totalRoomPrice += room.price * currentOrder.numberOfNights;
+    });
+    currentOrder.totalPrice = totalRoomPrice;
+
+    // Gör anrop till databasen och skickar med den reviderade currentOrder beroende på req
     const result = await updateOrder(currentOrder, orderId);
+
     if (result) {
-      await toggleAvailableRoom(updateReq.changeRoomId, true);
-      await toggleAvailableRoom(updateReq.newRoomId, false);
+      // Om allt fungerar så togglas rummens status ifall de finns i req
+      if (updateReq.removeRoomId)
+        await toggleAvailableRoom(updateReq.removeRoomId, true);
+      if (updateReq.newRoomId)
+        await toggleAvailableRoom(updateReq.newRoomId, false);
+
       return sendResponses(200, {
         success: true,
         updatedOrder: result,
@@ -120,24 +129,3 @@ export const handler = middy(async (event) => {
   .use(validateOrderId())
   .use(validatePutOrderById())
   .use(errorHandler());
-
-// Som en gäst vill jag kunna ändra min bokning ifall mina planer ändras.
-
-// API endpoint: /api/orders/{orderID}
-
-// PUT på orderID
-
-// Följande detaljer kan ändras i en bokning men logiken för rummen ska följas om antalet gäster eller rum ändras:
-
-// Antal gäster
-// Vilka rumstyper och antal
-// Antal nätter
-// modifiedAt (datum med utilsfunktionen generateDate)
-// Eventuellt extra att göra:
-
-// Toggla "available = true/false" för rummen
-
-// HITTADE BUGGAR
-// När man kör postOrder så ska även orderId följa med tillbaka
-// Totalpris ska det även vara när man kör postOrder, nu läggs inte alla pengar ihop
-// Vad händer när man tar bort changeRoomId så att roomsBooked blir tom?
