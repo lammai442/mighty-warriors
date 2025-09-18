@@ -41,7 +41,7 @@ export const handler = middy(async (event) => {
     }
   }
 
-  if (orderRooms.length > orderRequest.guests) {
+  if (orderRooms.length > orderRequest.numberOfGuests) {
     return sendResponses(400, {
       success: false,
       message: `Can't order more rooms than there are guests.`,
@@ -60,7 +60,7 @@ export const handler = middy(async (event) => {
     pricePerNight += room.price;
   });
 
-  if (orderRequest.guests > numberOfBeds) {
+  if (orderRequest.numberOfGuests > numberOfBeds) {
     return sendResponses(400, {
       success: false,
       message: `Can't order rooms with fewer beds than there are guests.`,
@@ -69,10 +69,13 @@ export const handler = middy(async (event) => {
 
   // ----- -----
 
-  // Byter ut .rooms mot de rum som hämtades innan
+  // Skapar roomsBooked inuti orderRequest och fyller den med de rum som hämtades innan. Nycken orderRequest.rooms tas bort.
   // All annan data som behövs finns annars redan i orderRequest
-  orderRequest.rooms = orderRooms;
-  orderRequest.totalPrice = pricePerNight * orderRequest.nights;
+  orderRequest.roomsBooked = orderRooms;
+  delete orderRequest.rooms;
+  console.log('Log check for orderRequest: ', orderRequest);
+
+  orderRequest.totalPrice = pricePerNight * orderRequest.numberOfNights;
   orderRequest.orderId = generateId('ORDER');
 
   // Skapar ordern
@@ -80,14 +83,14 @@ export const handler = middy(async (event) => {
 
   if (result) {
     // Om vi lyckats skapa en order så ändras "available" på rummen till false.
-    for (const room of orderRequest.rooms) {
+    for (const room of orderRequest.roomsBooked) {
       await toggleAvailableRoom(room.sk, false);
     }
 
     return sendResponses(201, {
       success: true,
       message: 'Successfully created order',
-      orderRequest,
+      order: orderRequest,
     });
   } else {
     return sendResponses(500, {
