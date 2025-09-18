@@ -265,9 +265,9 @@ url: /api/orders
 
 ```json
 {
-  "guests": 3,
+  "numberOfGuests": 3,
   "rooms": ["ROOM#DOUBLE#16149", "ROOM#SINGLE#2e309"],
-  "nights": 1,
+  "numberOfNights": 1,
   "name": "Namn Namnsson",
   "email": "user@usermail.com"
 }
@@ -322,8 +322,8 @@ url: /api/orders/{orderId} (OBS, endast de 5 sista tecknen i orderId:t ska skick
 {
   "removeRoomId": "ROOM#DOUBLE#6f587",
   "newRoomId": "ROOM#SUITE#d6ab6",
-  "nights": 2,
-  "guests": 2
+  "numberOfNights": 2,
+  "numberOfGuests": 2
 }
 ```
 
