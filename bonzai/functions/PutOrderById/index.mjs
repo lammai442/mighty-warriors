@@ -70,14 +70,14 @@ export const handler = middy(async (event) => {
 
     if (updateReq.changeRoomId) {
       // Kontroll om changeRoomId finns med i alla rum
-      const changeRoomExists = allRooms.some(
+      const changeRoomExists = currentOrder.roomsBooked.some(
         (r) => r.sk === updateReq.changeRoomId
       );
       // Om changeRoomId inte finns med i listan av alla rum
       if (!changeRoomExists) {
         return sendResponses(400, {
           success: false,
-          message: 'Invalid id of changeRoomId',
+          message: 'ChangeRoomId does not exist in current order',
         });
       }
 
@@ -136,3 +136,8 @@ export const handler = middy(async (event) => {
 // Eventuellt extra att göra:
 
 // Toggla "available = true/false" för rummen
+
+// HITTADE BUGGAR
+// När man kör postOrder så ska även orderId följa med tillbaka
+// Totalpris ska det även vara när man kör postOrder, nu läggs inte alla pengar ihop
+// Vad händer när man tar bort changeRoomId så att roomsBooked blir tom?
