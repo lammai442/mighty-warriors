@@ -1,12 +1,14 @@
 import { client } from './client.mjs';
 import {
   QueryCommand,
+  UpdateItemCommand,
   PutItemCommand,
   GetItemCommand,
   DeleteItemCommand,
 } from '@aws-sdk/client-dynamodb';
 import { unmarshall, marshall } from '@aws-sdk/util-dynamodb';
 import { generateDate } from '../utils/generateDate.mjs';
+import { generateId } from '../utils/generateId.mjs';
 
 export const getAllOrders = async () => {
   const command = new QueryCommand({
@@ -114,5 +116,41 @@ export const deleteOrder = async (orderId) => {
   } catch (error) {
     console.log('ERROR in db', error.message);
     return false;
+  }
+};
+
+export const updateOrder = async (updatedOrder, orderId) => {
+  const command = new UpdateItemCommand({
+    TableName: 'bonzai-db',
+    Key: {
+      pk: { S: 'ORDER' },
+      sk: { S: `ORDER#${orderId}` },
+    },
+    UpdateExpression:
+      'SET #nights = :nights, #guests = :guests, #totalPrice = :totalPrice, #rooms = :rooms, #modifiedAt = :modifiedAt',
+    ExpressionAttributeNames: {
+      '#nights': 'numberOfNights',
+      '#guests': 'numberOfGuests',
+      '#totalPrice': 'totalPrice',
+      '#rooms': 'roomsBooked',
+      '#modifiedAt': 'modifiedAt',
+    },
+    ExpressionAttributeValues: {
+      ':nights': { N: updatedOrder.numberOfNights.toString() },
+      ':guests': { N: updatedOrder.numberOfGuests.toString() },
+      ':totalPrice': { N: updatedOrder.totalPrice.toString() },
+      ':rooms': {
+        L: updatedOrder.roomsBooked.map((r) => ({ M: marshall(r) })),
+      },
+      ':modifiedAt': { S: generateDate() },
+    },
+    ReturnValues: 'UPDATED_NEW',
+  });
+  try {
+    const result = await client.send(command);
+    return unmarshall(result.Attributes);
+  } catch (error) {
+    console.log('Error in updateOrder-db', error.message);
+    throw error;
   }
 };

@@ -2,8 +2,8 @@ import { client } from './client.mjs';
 import {
   PutItemCommand,
   QueryCommand,
-  UpdateItemCommand,
   GetItemCommand,
+  UpdateItemCommand,
 } from '@aws-sdk/client-dynamodb';
 import { generateId } from '../utils/generateId.mjs';
 import { unmarshall } from '@aws-sdk/util-dynamodb';
