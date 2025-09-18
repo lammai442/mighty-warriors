@@ -6,6 +6,12 @@ import { updateOrder, getOrderById } from '../../services/orders.mjs';
 import httpJsonBodyParser from '@middy/http-json-body-parser';
 import { getAllRooms, toggleAvailableRoom } from '../../services/rooms.mjs';
 import { validatePutOrderById } from '../../middelwares/validatePutOrderById.mjs';
+import {
+  validateBeds,
+  validateIsRoomAvailable,
+  validateRoomId,
+  validateRooms,
+} from '../../utils/validators.mjs';
 export const handler = middy(async (event) => {
   const { orderId } = event.pathParameters || {};
   let currentOrder = await getOrderById(orderId);
@@ -18,26 +24,23 @@ export const handler = middy(async (event) => {
     // Om användare endast vill lägga till ett rum
     if (updateReq.newRoomId) {
       // Kontroll om newRoomId finns med i alla rum
-      const newRoomExists = allRooms.some((r) => r.sk === updateReq.newRoomId);
-      // Kontroll om newRoom är available
-      const isNewRoomAvailable = allRooms.some(
-        (r) => r.sk === updateReq.newRoomId && r.available === true
-      );
-      if (!newRoomExists) {
-        return sendResponses(400, {
+      let newRoom = validateRoomId(allRooms, updateReq.newRoomId);
+
+      if (!newRoom) {
+        return sendResponses(404, {
           success: false,
-          message: 'Invalid id of newRoomId',
+          message: `Room with ID: ${updateReq.newRoomId} doesn't exist`,
         });
       }
-      // Om newRoomId inte är available
-      else if (!isNewRoomAvailable) {
-        return sendResponses(400, {
+
+      if (newRoom.available === false) {
+        return sendResponses(404, {
           success: false,
-          message: 'Choice of new room is not available',
+          message: `Choice of room with ID: ${updateReq.newRoomId} is not available`,
         });
       }
-      // Hämtar hem objektet i allRooms-arrayen
-      let newRoom = allRooms.find((r) => r.sk === updateReq.newRoomId);
+
+      // Lägger upp nya rummet i roomsBooked
       currentOrder.roomsBooked.push(newRoom);
     }
 
@@ -68,25 +71,39 @@ export const handler = middy(async (event) => {
       // Ersätter med den nya roomsBooked-arr
       currentOrder.roomsBooked = updatedRoomsBooked;
     }
-
+    // _______________
     // Kontroll att det inte är fler gäster än sängar
-    let numberOfBeds = 0;
+    // let numberOfBeds = 0;
 
-    currentOrder.roomsBooked.forEach((room) => {
-      numberOfBeds += room.beds;
-    });
+    // currentOrder.roomsBooked.forEach((room) => {
+    //   numberOfBeds += room.beds;
+    // });
 
-    if (updateReq.numberOfGuests > numberOfBeds) {
+    // if (updateReq.numberOfGuests > numberOfBeds) {
+    //   return sendResponses(400, {
+    //     success: false,
+    //     message: `Can't order rooms with fewer beds than there are guests.`,
+    //   });
+    // }
+
+    // if (updateReq.numberOfGuests)
+    //   currentOrder.numberOfGuests = updateReq.numberOfGuests;
+
+    // if (currentOrder.roomsBooked.length > currentOrder.numberOfGuests) {
+    //   return sendResponses(400, {
+    //     success: false,
+    //     message: `Can't order more rooms than there are guests.`,
+    //   });
+    // }
+    // ___________
+
+    if (!validateBeds(currentOrder, updateReq.numberOfGuests)) {
       return sendResponses(400, {
-        success: false,
         message: `Can't order rooms with fewer beds than there are guests.`,
       });
     }
 
-    if (updateReq.numberOfGuests)
-      currentOrder.numberOfGuests = updateReq.numberOfGuests;
-
-    if (currentOrder.roomsBooked.length > currentOrder.numberOfGuests) {
+    if (!validateRooms(currentOrder)) {
       return sendResponses(400, {
         success: false,
         message: `Can't order more rooms than there are guests.`,
@@ -102,6 +119,7 @@ export const handler = middy(async (event) => {
     currentOrder.roomsBooked.forEach((room) => {
       totalRoomPrice += room.price * currentOrder.numberOfNights;
     });
+
     currentOrder.totalPrice = totalRoomPrice;
 
     // Gör anrop till databasen och skickar med den reviderade currentOrder beroende på req
