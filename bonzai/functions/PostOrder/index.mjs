@@ -73,7 +73,6 @@ export const handler = middy(async (event) => {
   // All annan data som behövs finns annars redan i orderRequest
   orderRequest.roomsBooked = orderRooms;
   delete orderRequest.rooms;
-  console.log('Log check for orderRequest: ', orderRequest);
 
   orderRequest.totalPrice = pricePerNight * orderRequest.numberOfNights;
   orderRequest.orderId = generateId('ORDER');
