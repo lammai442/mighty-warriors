@@ -1,8 +1,8 @@
 import middy from '@middy/core';
 import { sendResponses } from '../../responses/index.mjs';
-import { errorHandler } from '../../middelwares/errorHandler.mjs';
+import { errorHandler } from '../../middlewares/errorHandler.mjs';
 import { getAllOrders } from '../../services/orders.mjs';
-import { validateOrderId } from '../../middelwares/validateOrderId.mjs';
+import { validateOrderId } from '../../middlewares/validateOrderId.mjs';
 import { getRoomById } from '../../services/rooms.mjs';
 
 export const handler = middy(async (event) => {
@@ -11,7 +11,6 @@ export const handler = middy(async (event) => {
   if (result) {
     return sendResponses(200, {
       success: true,
-      newRoom: newRoom,
       orders: result,
     });
   } else {

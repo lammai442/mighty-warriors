@@ -1,11 +1,11 @@
 import middy from '@middy/core';
 import { sendResponses } from '../../responses/index.mjs';
-import { errorHandler } from '../../middelwares/errorHandler.mjs';
-import { validateOrderId } from '../../middelwares/validateOrderId.mjs';
+import { errorHandler } from '../../middlewares/errorHandler.mjs';
+import { validateOrderId } from '../../middlewares/validateOrderId.mjs';
 import { updateOrder, getOrderById } from '../../services/orders.mjs';
 import httpJsonBodyParser from '@middy/http-json-body-parser';
 import { getAllRooms, toggleAvailableRoom } from '../../services/rooms.mjs';
-import { validatePutOrderById } from '../../middelwares/validatePutOrderById.mjs';
+import { validatePutOrderById } from '../../middlewares/validatePutOrderById.mjs';
 import {
   validateBeds,
   validateIsRoomAvailable,

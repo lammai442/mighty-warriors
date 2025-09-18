@@ -1,8 +1,8 @@
 import { sendResponses } from '../../responses/index.mjs';
 import middy from '@middy/core';
-import { errorHandler } from '../../middelwares/errorHandler.mjs';
+import { errorHandler } from '../../middlewares/errorHandler.mjs';
 import httpJsonBodyParser from '@middy/http-json-body-parser';
-import { validateOrder } from '../../middelwares/validateOrder.mjs';
+import { validateOrder } from '../../middlewares/validateOrder.mjs';
 import { getAllRooms } from '../../services/rooms.mjs';
 import { createOrder } from '../../services/orders.mjs';
 import { toggleAvailableRoom } from '../../services/rooms.mjs';

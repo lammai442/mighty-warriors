@@ -1,7 +1,7 @@
 {
   "watch": [
     "functions",
-    "middelwares",
+    "middlewares",
     "models",
     "responses",
     "services",
