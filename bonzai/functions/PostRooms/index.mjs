@@ -2,8 +2,8 @@ import { sendResponses } from '../../responses/index.mjs';
 import middy from '@middy/core';
 import { addRoom } from '../../services/rooms.mjs';
 import httpJsonBodyParser from '@middy/http-json-body-parser';
-import { errorHandler } from '../../middelwares/errorHandler.mjs';
-import { validateRoom } from '../../middelwares/validateRoom.mjs';
+import { errorHandler } from '../../middlewares/errorHandler.mjs';
+import { validateRoom } from '../../middlewares/validateRoom.mjs';
 
 export const handler = middy(async (event) => {
   const result = await addRoom(event.body);

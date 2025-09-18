@@ -1,8 +1,8 @@
 import middy from '@middy/core';
 import { sendResponses } from '../../responses/index.mjs';
-import { errorHandler } from '../../middelwares/errorHandler.mjs';
+import { errorHandler } from '../../middlewares/errorHandler.mjs';
 import { getOrderById } from '../../services/orders.mjs';
-import { validateOrderId } from '../../middelwares/validateOrderId.mjs';
+import { validateOrderId } from '../../middlewares/validateOrderId.mjs';
 
 export const handler = middy(async (event) => {
   const { orderId } = event.pathParameters || {};
