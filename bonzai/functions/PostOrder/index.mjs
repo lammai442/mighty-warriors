@@ -10,6 +10,7 @@ import { generateId } from '../../utils/generateId.mjs';
 
 export const handler = middy(async (event) => {
   const orderRequest = event.body;
+
   const allRooms = await getAllRooms();
 
   const orderRooms = [];
