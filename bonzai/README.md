@@ -17,7 +17,7 @@ sk: alla rum börjar med ROOM#. Därefter följer rumstypen, SINGLE, DOUBLE elle
     		"pk": "ROOM",
     		"price": 1500,
     		"beds": 1,
-    		"sk": "ROOM#DOUBLE#16149"
+    		"sk": "ROOM#DOUBLE#5ea73"
     	},
 
 ### Order
@@ -27,33 +27,32 @@ Exempel på en order med två bokade rum.
 #### Exempel:
 
 <pre>
-[{
-"numberOfGuests": 3,
-"roomsBooked": [
 {
-"available": true,
-"sk": "ROOM#DOUBLE#7a8c6",
-"createdAt": "2025-09-15T13:05:15.482Z",
-"pk": "ROOM",
-"beds": 2,
-"price": 1000
-},
-{
-"available": true,
-"sk": "ROOM#SINGLE#1cbf5",
-"createdAt": "2025-09-15T13:04:49.493Z",
-"pk": "ROOM",
-"beds": 1,
-"price": 500
-}
-],
-"bookedBy": "User123",
-"createdAt": "2025-09-16T14:42:16.342Z",
-"numberOfNights": 4,
-"price": 1500,
-"pk": "ORDER",
-"sk": "ORDER#f641a"
-}]</pre>
+		"numberOfGuests": 4,
+		"numberOfNights": 5,
+		"name": "Karin Boye",
+		"email": "user@usermail.com",
+		"roomsBooked": [
+			{
+				"available": true,
+				"beds": 2,
+				"createdAt": "2025-09-17T07:44:07.561Z",
+				"pk": "ROOM",
+				"price": 1500,
+				"sk": "ROOM#DOUBLE#16149"
+			},
+			{
+				"available": true,
+				"beds": 2,
+				"createdAt": "2025-09-15T13:05:15.482Z",
+				"pk": "ROOM",
+				"price": 1000,
+				"sk": "ROOM#DOUBLE#7a8c6"
+			}
+		],
+		"totalPrice": 12500,
+		"orderId": "ORDER#01b1e"
+	}</pre>
 
 ## API-anrop
 
@@ -153,50 +152,50 @@ url: /api/orders
   "success": true,
   "orders": [
     {
-      "numberOfGuests": 1,
+      "numberOfGuests": 4,
+      "totalPrice": 12500,
       "roomsBooked": [
         {
           "available": true,
-          "sk": "ROOM#DOUBLE#a8662",
-          "createdAt": "2025-09-16T14:36:47.428Z",
-          "pk": "ROOM",
-          "beds": 1,
-          "price": 1500
-        }
-      ],
-      "bookedBy": "Klara",
-      "createdAt": "2025-09-17T07:33:10.070Z",
-      "numberOfNights": 1,
-      "price": 1500,
-      "pk": "ORDER",
-      "sk": "ORDER#29c35"
-    },
-    {
-      "numberOfGuests": 3,
-      "roomsBooked": [
-        {
-          "available": true,
-          "sk": "ROOM#DOUBLE#5ea73",
-          "createdAt": "2025-09-15T13:05:19.164Z",
+          "sk": "ROOM#DOUBLE#16149",
+          "createdAt": "2025-09-17T07:44:07.561Z",
           "pk": "ROOM",
           "beds": 2,
-          "price": 1000
+          "price": 1500
         },
         {
           "available": true,
-          "sk": "ROOM#SINGLE#f45c8",
-          "createdAt": "2025-09-15T13:04:44.648Z",
+          "sk": "ROOM#DOUBLE#7a8c6",
+          "createdAt": "2025-09-15T13:05:15.482Z",
           "pk": "ROOM",
-          "beds": 1,
-          "price": 500
+          "beds": 2,
+          "price": 1000
         }
       ],
-      "bookedBy": "Namn Namnsson",
-      "createdAt": "2025-09-17T10:42:52.597Z",
-      "numberOfNights": 1,
-      "price": 1500,
+      "bookedBy": "Karin Boye",
+      "createdAt": "2025-09-19T08:09:10.254Z",
+      "numberOfNights": 5,
       "pk": "ORDER",
-      "sk": "ORDER#39382"
+      "sk": "ORDER#01b1e"
+    },
+    {
+      "numberOfGuests": 2,
+      "totalPrice": 1000,
+      "roomsBooked": [
+        {
+          "available": true,
+          "sk": "ROOM#DOUBLE#6f587",
+          "createdAt": "2025-09-15T13:05:17.185Z",
+          "pk": "ROOM",
+          "beds": 2,
+          "price": 1000
+        }
+      ],
+      "bookedBy": "Gunnar Ehne",
+      "createdAt": "2025-09-19T08:08:19.926Z",
+      "numberOfNights": 1,
+      "pk": "ORDER",
+      "sk": "ORDER#12648"
     }
   ]
 }
@@ -221,31 +220,31 @@ url: /api/orders/{orderId} (OBS, endast de 5 sista tecknen i orderId:t ska skick
 {
   "success": true,
   "orders": {
-    "numberOfGuests": 3,
+    "numberOfGuests": 4,
+    "totalPrice": 12500,
     "roomsBooked": [
       {
         "available": true,
-        "sk": "ROOM#DOUBLE#5ea73",
-        "createdAt": "2025-09-15T13:05:19.164Z",
+        "sk": "ROOM#DOUBLE#16149",
+        "createdAt": "2025-09-17T07:44:07.561Z",
         "pk": "ROOM",
         "beds": 2,
-        "price": 1000
+        "price": 1500
       },
       {
         "available": true,
-        "sk": "ROOM#SINGLE#f45c8",
-        "createdAt": "2025-09-15T13:04:44.648Z",
+        "sk": "ROOM#DOUBLE#7a8c6",
+        "createdAt": "2025-09-15T13:05:15.482Z",
         "pk": "ROOM",
-        "beds": 1,
-        "price": 500
+        "beds": 2,
+        "price": 1000
       }
     ],
-    "bookedBy": "Namn Namnsson",
-    "createdAt": "2025-09-17T10:42:52.597Z",
-    "numberOfNights": 1,
-    "price": 1500,
+    "bookedBy": "Karin Boye",
+    "createdAt": "2025-09-19T08:09:10.254Z",
+    "numberOfNights": 5,
     "pk": "ORDER",
-    "sk": "ORDER#39382"
+    "sk": "ORDER#01b1e"
   }
 }
 ```
@@ -265,10 +264,10 @@ url: /api/orders
 
 ```json
 {
-  "numberOfGuests": 3,
-  "rooms": ["ROOM#DOUBLE#16149", "ROOM#SINGLE#2e309"],
-  "numberOfNights": 1,
-  "name": "Namn Namnsson",
+  "numberOfGuests": 4,
+  "rooms": ["ROOM#DOUBLE#16149", "ROOM#DOUBLE#7a8c6"],
+  "numberOfNights": 5,
+  "name": "Karin Boye",
   "email": "user@usermail.com"
 }
 ```
@@ -277,25 +276,34 @@ url: /api/orders
 
 ```json
 {
+  "success": true,
   "message": "Successfully created order",
-  "orderRooms": [
-    {
-      "createdAt": "2025-09-15T13:05:19.164Z",
-      "available": true,
-      "pk": "ROOM",
-      "price": 1000,
-      "beds": 2,
-      "sk": "ROOM#DOUBLE#16149"
-    },
-    {
-      "createdAt": "2025-09-15T13:04:44.648Z",
-      "available": true,
-      "pk": "ROOM",
-      "price": 500,
-      "beds": 1,
-      "sk": "ROOM#SINGLE#2e309"
-    }
-  ]
+  "order": {
+    "numberOfGuests": 4,
+    "numberOfNights": 5,
+    "name": "Karin Boye",
+    "email": "user@usermail.com",
+    "roomsBooked": [
+      {
+        "available": true,
+        "beds": 2,
+        "createdAt": "2025-09-17T07:44:07.561Z",
+        "pk": "ROOM",
+        "price": 1500,
+        "sk": "ROOM#DOUBLE#16149"
+      },
+      {
+        "available": true,
+        "beds": 2,
+        "createdAt": "2025-09-15T13:05:15.482Z",
+        "pk": "ROOM",
+        "price": 1000,
+        "sk": "ROOM#DOUBLE#7a8c6"
+      }
+    ],
+    "totalPrice": 12500,
+    "orderId": "ORDER#01b1e"
+  }
 }
 ```
 
@@ -306,8 +314,9 @@ Uppdaterar en specifik order baserat på id. Innehållet i bodyn beror på vad s
 - Om endast antal nätter ska uppdateras behöver endast nights skickas med.
 - Samma sak gäller för antal gäster angående nyckelvärdeparet guests.
 - Om användaren vill byta rum ska både det gamla rums-id:t och det nya rums-id:t skickas med.
-
-Antalet gäster måste överensstämma med antalet sängar i ordern.
+- Endast ett rum i taget kan ändras.
+- Ordern måste alltid innehålla minst ett rum.
+- Antalet gäster måste överensstämma med antalet sängar i ordern.
 
 ##### Exempel:
 
@@ -320,10 +329,10 @@ url: /api/orders/{orderId} (OBS, endast de 5 sista tecknen i orderId:t ska skick
 
 ```json
 {
-  "removeRoomId": "ROOM#DOUBLE#6f587",
-  "newRoomId": "ROOM#SUITE#d6ab6",
-  "numberOfNights": 2,
-  "numberOfGuests": 2
+  "removeRoomId": "ROOM#DOUBLE#6f587", // optional
+  "newRoomId": "ROOM#SUITE#d6ab6", // optional
+  "numberOfNights": 2, // optional
+  "numberOfGuests": 2 // optional
 }
 ```
 
