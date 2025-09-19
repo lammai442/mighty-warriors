@@ -7,6 +7,11 @@ import { getAllRooms } from '../../services/rooms.mjs';
 import { createOrder } from '../../services/orders.mjs';
 import { toggleAvailableRoom } from '../../services/rooms.mjs';
 import { generateId } from '../../utils/generateId.mjs';
+import {
+  validateBeds,
+  validateRoomId,
+  validateRooms,
+} from '../../utils/validators.mjs';
 
 export const handler = middy(async (event) => {
   const orderRequest = event.body;
@@ -18,61 +23,46 @@ export const handler = middy(async (event) => {
   // Loopar igenom alla rumsID som skickas med i body
   for (const roomId of orderRequest.rooms) {
     // Letar upp det efterfrågade rummet (i varje loop)
-    // Inte bara true/false utan hela rummet
-    const room = allRooms.find((r) => r.sk.includes(roomId));
+    const room = validateRoomId(allRooms, roomId);
 
-    // Om rummet inte finns så returneras 404
-    if (room === undefined) {
+    if (!room) {
       return sendResponses(404, {
         success: false,
         message: `Room with ID: ${roomId} doesn't exist`,
       });
-
-      // Om rummet finns men är otillgängligt
     } else if (room.available === false) {
       return sendResponses(503, {
         success: false,
         message: `Room with ID: ${roomId} is unavailable`,
       });
-
-      // Om rummet finns och är tillgängligt
     } else {
       orderRooms.push(room);
     }
   }
-
-  if (orderRooms.length > orderRequest.numberOfGuests) {
-    return sendResponses(400, {
-      success: false,
-      message: `Can't order more rooms than there are guests.`,
-    });
-  }
+  orderRequest.roomsBooked = orderRooms;
+  delete orderRequest.rooms;
 
   // ----- -----
 
-  // Kontroll att det inte är fler gäster än sängar
-  // Räknar även det totala priset för ordern per natt
-  let numberOfBeds = 0;
-  let pricePerNight = 0;
-
-  orderRooms.forEach((room) => {
-    numberOfBeds += room.beds;
-    pricePerNight += room.price;
-  });
-
-  if (orderRequest.numberOfGuests > numberOfBeds) {
+  if (!validateBeds(orderRequest)) {
     return sendResponses(400, {
       success: false,
       message: `Can't order rooms with fewer beds than there are guests.`,
     });
   }
 
-  // ----- -----
+  if (!validateRooms(orderRequest)) {
+    return sendResponses(400, {
+      success: false,
+      message: `Can't order more rooms than there are guests.`,
+    });
+  }
 
-  // Skapar roomsBooked inuti orderRequest och fyller den med de rum som hämtades innan. Nycken orderRequest.rooms tas bort.
-  // All annan data som behövs finns annars redan i orderRequest
-  orderRequest.roomsBooked = orderRooms;
-  delete orderRequest.rooms;
+  let pricePerNight = 0;
+
+  orderRooms.forEach((room) => {
+    pricePerNight += room.price;
+  });
 
   orderRequest.totalPrice = pricePerNight * orderRequest.numberOfNights;
   orderRequest.orderId = generateId('ORDER');

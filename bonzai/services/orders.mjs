@@ -123,7 +123,7 @@ export const updateOrder = async (updatedOrder, orderId) => {
       },
       ':modifiedAt': { S: generateDate() },
     },
-    ReturnValues: 'UPDATED_NEW',
+    ReturnValues: 'ALL_NEW',
   });
   try {
     const result = await client.send(command);
