@@ -22,7 +22,6 @@ export const handler = middy(async (event) => {
 
     // Om användare endast vill lägga till ett rum
     if (updateReq.newRoomId) {
-      // Kontroll om newRoomId finns med i alla rum
       let newRoom = validateRoomId(allRooms, updateReq.newRoomId);
 
       if (!newRoom) {
@@ -38,25 +37,22 @@ export const handler = middy(async (event) => {
           message: `Choice of room with ID: ${updateReq.newRoomId} is not available`,
         });
       }
-
-      // Lägger upp nya rummet i roomsBooked
       currentOrder.roomsBooked.push(newRoom);
     }
 
-    // Om användaren skickar med att den vill byta rum från
+    // Om användaren skickar med att den vill ta bort rum
     if (updateReq.removeRoomId) {
-      // Kontroll om removeRoomId finns med i alla rum
-      const changeRoomExists = currentOrder.roomsBooked.some(
-        (r) => r.sk === updateReq.removeRoomId
+      const removeRoomExists = validateRoomId(
+        currentOrder.roomsBooked,
+        updateReq.removeRoomId
       );
-      // Om removeRoomId inte finns med i listan av alla rum
-      if (!changeRoomExists) {
+
+      if (!removeRoomExists) {
         return sendResponses(400, {
           success: false,
           message: 'removeRoomId does not exist in current order',
         });
       }
-
       // Här tas det rum man vill byta bort från roomsBooked-arr
       const updatedRoomsBooked = currentOrder.roomsBooked.filter(
         (r) => r.sk !== updateReq.removeRoomId
@@ -67,34 +63,8 @@ export const handler = middy(async (event) => {
           message: 'Your order must include a least one room',
         });
       }
-      // Ersätter med den nya roomsBooked-arr
       currentOrder.roomsBooked = updatedRoomsBooked;
     }
-    // _______________
-    // Kontroll att det inte är fler gäster än sängar
-    // let numberOfBeds = 0;
-
-    // currentOrder.roomsBooked.forEach((room) => {
-    //   numberOfBeds += room.beds;
-    // });
-
-    // if (updateReq.numberOfGuests > numberOfBeds) {
-    //   return sendResponses(400, {
-    //     success: false,
-    //     message: `Can't order rooms with fewer beds than there are guests.`,
-    //   });
-    // }
-
-    // if (updateReq.numberOfGuests)
-    //   currentOrder.numberOfGuests = updateReq.numberOfGuests;
-
-    // if (currentOrder.roomsBooked.length > currentOrder.numberOfGuests) {
-    //   return sendResponses(400, {
-    //     success: false,
-    //     message: `Can't order more rooms than there are guests.`,
-    //   });
-    // }
-    // ___________
 
     if (!validateBeds(currentOrder, updateReq.numberOfGuests)) {
       return sendResponses(400, {
@@ -112,7 +82,6 @@ export const handler = middy(async (event) => {
     if (updateReq.numberOfNights)
       currentOrder.numberOfNights = parseInt(updateReq.numberOfNights);
 
-    // Uppdaterar totalsumman för hela ordern
     let totalRoomPrice = 0;
 
     currentOrder.roomsBooked.forEach((room) => {
@@ -121,7 +90,6 @@ export const handler = middy(async (event) => {
 
     currentOrder.totalPrice = totalRoomPrice;
 
-    // Gör anrop till databasen och skickar med den reviderade currentOrder beroende på req
     const result = await updateOrder(currentOrder, orderId);
 
     if (result) {

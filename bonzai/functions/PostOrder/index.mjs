@@ -7,7 +7,11 @@ import { getAllRooms } from '../../services/rooms.mjs';
 import { createOrder } from '../../services/orders.mjs';
 import { toggleAvailableRoom } from '../../services/rooms.mjs';
 import { generateId } from '../../utils/generateId.mjs';
-import { validateBeds, validateRooms } from '../../utils/validators.mjs';
+import {
+  validateBeds,
+  validateRoomId,
+  validateRooms,
+} from '../../utils/validators.mjs';
 
 export const handler = middy(async (event) => {
   const orderRequest = event.body;
@@ -19,24 +23,18 @@ export const handler = middy(async (event) => {
   // Loopar igenom alla rumsID som skickas med i body
   for (const roomId of orderRequest.rooms) {
     // Letar upp det efterfrågade rummet (i varje loop)
-    // Inte bara true/false utan hela rummet
-    const room = allRooms.find((r) => r.sk.includes(roomId));
+    const room = validateRoomId(allRooms, roomId);
 
-    // Om rummet inte finns så returneras 404
-    if (room === undefined) {
+    if (!room) {
       return sendResponses(404, {
         success: false,
         message: `Room with ID: ${roomId} doesn't exist`,
       });
-
-      // Om rummet finns men är otillgängligt
     } else if (room.available === false) {
       return sendResponses(503, {
         success: false,
         message: `Room with ID: ${roomId} is unavailable`,
       });
-
-      // Om rummet finns och är tillgängligt
     } else {
       orderRooms.push(room);
     }
@@ -63,7 +61,6 @@ export const handler = middy(async (event) => {
   let pricePerNight = 0;
 
   orderRooms.forEach((room) => {
-    // numberOfBeds += room.beds;
     pricePerNight += room.price;
   });
 
