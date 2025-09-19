@@ -1,0 +1,12 @@
+{
+  "watch": [
+    "functions",
+    "middlewares",
+    "models",
+    "responses",
+    "services",
+    "utils"
+  ],
+  "ext": "js,json,mjs",
+  "exec": "npx serverless offline"
+}

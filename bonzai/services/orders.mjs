@@ -1,0 +1,135 @@
+import { client } from './client.mjs';
+import {
+  QueryCommand,
+  UpdateItemCommand,
+  PutItemCommand,
+  GetItemCommand,
+  DeleteItemCommand,
+} from '@aws-sdk/client-dynamodb';
+import { unmarshall, marshall } from '@aws-sdk/util-dynamodb';
+import { generateDate } from '../utils/generateDate.mjs';
+
+export const getAllOrders = async () => {
+  const command = new QueryCommand({
+    TableName: 'bonzai-db',
+    KeyConditionExpression: 'pk= :pk AND begins_with(sk, :sk)',
+    ExpressionAttributeValues: {
+      ':pk': { S: 'ORDER' },
+      ':sk': { S: 'ORDER#' },
+    },
+  });
+
+  try {
+    const data = await client.send(command);
+    if (!data.Items || data.Items.length === 0) return [];
+
+    const orders = data.Items.map((item) => unmarshall(item));
+    return orders;
+  } catch (error) {
+    console.log('ERROR in orders-db', error.message);
+    return false;
+  }
+};
+
+export const getOrderById = async (orderId) => {
+  const command = new GetItemCommand({
+    TableName: 'bonzai-db',
+    Key: {
+      pk: { S: 'ORDER' },
+      sk: { S: `ORDER#${orderId}` },
+    },
+  });
+
+  try {
+    const { Item } = await client.send(command);
+    return unmarshall(Item);
+  } catch (error) {
+    console.log('ERROR in db', error.message);
+    return false;
+  }
+};
+
+export const createOrder = async (orderRequest) => {
+  // Bestämmer vad objektet man vill skicka in ska innehålla
+  const order = {
+    pk: 'ORDER',
+    sk: orderRequest.orderId,
+    numberOfNights: orderRequest.numberOfNights,
+    numberOfGuests: orderRequest.numberOfGuests,
+    bookedBy: orderRequest.name,
+    // orderRequest.rooms är en array av objekt som innehåller rummen
+    roomsBooked: orderRequest.roomsBooked,
+    totalPrice: orderRequest.totalPrice,
+    createdAt: generateDate(),
+  };
+
+  // "marshall(order)" ser till att objektet följer systemet med { S: } { N: } osv.
+  const params = {
+    TableName: 'bonzai-db',
+    Item: marshall(order),
+  };
+
+  try {
+    // Bara att skicka in params efteråt
+    const result = await client.send(new PutItemCommand(params));
+    return result;
+  } catch (error) {
+    console.log('ERROR in db', error.message);
+    return false;
+  }
+};
+
+export const deleteOrder = async (orderId) => {
+  const command = new DeleteItemCommand({
+    TableName: 'bonzai-db',
+    Key: {
+      pk: { S: 'ORDER' },
+      sk: { S: `ORDER#${orderId}` },
+    },
+    ReturnValues: 'ALL_OLD',
+  });
+
+  try {
+    const result = await client.send(command);
+    return result;
+  } catch (error) {
+    console.log('ERROR in db', error.message);
+    return false;
+  }
+};
+
+export const updateOrder = async (updatedOrder, orderId) => {
+  const command = new UpdateItemCommand({
+    TableName: 'bonzai-db',
+    Key: {
+      pk: { S: 'ORDER' },
+      sk: { S: `ORDER#${orderId}` },
+    },
+    UpdateExpression:
+      'SET #nights = :nights, #guests = :guests, #totalPrice = :totalPrice, #rooms = :rooms, #modifiedAt = :modifiedAt',
+    ExpressionAttributeNames: {
+      '#nights': 'numberOfNights',
+      '#guests': 'numberOfGuests',
+      '#totalPrice': 'totalPrice',
+      '#rooms': 'roomsBooked',
+      '#modifiedAt': 'modifiedAt',
+    },
+    ExpressionAttributeValues: {
+      ':nights': { N: updatedOrder.numberOfNights.toString() },
+      ':guests': { N: updatedOrder.numberOfGuests.toString() },
+      ':totalPrice': { N: updatedOrder.totalPrice.toString() },
+      ':rooms': {
+        L: updatedOrder.roomsBooked.map((r) => ({ M: marshall(r) })),
+      },
+      ':modifiedAt': { S: generateDate() },
+    },
+    ReturnValues: 'ALL_NEW',
+  });
+  try {
+    const result = await client.send(command);
+    return unmarshall(result.Attributes);
+  } catch (error) {
+    console.log('Error in updateOrder-db', error.message);
+    throw error;
+  }
+};

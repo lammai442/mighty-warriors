@@ -1,0 +1,84 @@
+# prettier-ignore
+org: ${file(./config.yml):aws.org, 'default-org'}
+service: bonzai-api
+
+provider:
+  name: aws
+  runtime: nodejs20.x
+  region: eu-north-1
+  iam:
+    role: ${file(./config.yml):aws.role}
+
+functions:
+  GetRooms:
+    handler: functions/GetRooms/index.handler
+    events:
+      - httpApi:
+          path: /api/rooms
+          method: GET
+  PostRooms:
+    handler: functions/PostRooms/index.handler
+    events:
+      - httpApi:
+          path: /api/rooms
+          method: POST
+  DeleteOrder:
+    handler: functions/DeleteOrder/index.handler
+    events:
+      - httpApi:
+          path: /api/orders/{orderId}
+          method: DELETE
+  PostOrder:
+    handler: functions/PostOrder/index.handler
+    events:
+      - httpApi:
+          path: /api/orders
+          method: POST
+  GetOrderById:
+    handler: functions/GetOrderById/index.handler
+    events:
+      - httpApi:
+          path: /api/orders/{orderId}
+          method: GET
+  GetOrders:
+    handler: functions/GetOrders/index.handler
+    events:
+      - httpApi:
+          path: /api/orders
+          method: GET
+  PutOrderById:
+    handler: functions/PutOrderById/index.handler
+    events:
+      - httpApi:
+          path: /api/orders/{orderId}
+          method: PUT
+
+plugins:
+  - serverless-offline
+
+resources:
+  Resources:
+    # Här listar vi våra tabeller t ex Users, Customers, Products
+    BlogDB:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        # Namnet på tabellen som t ex lambdafunktionen kopplar upp mot i databasen
+        TableName: bonzai-db
+        # Här bestämmer man ifall man vill köra multi eller single design OCH MÅSTE VARA DEFINIERAD RÄTT FRÅN BÖRJAN ANNARS MÅSTE MAN BÖRJA OM DATABASEN
+        AttributeDefinitions:
+          # Här är det partition key och man kan använda sig av pk som är generisk
+          - AttributeName: pk
+            # Här står 'S' för string och vilken datatyp
+            AttributeType: S
+          - AttributeName: sk
+            AttributeType: S
+        # Här definierar vi våra partition key och eventuell sort key
+        KeySchema:
+          - AttributeName: pk
+            # Denna är partition key
+            KeyType: HASH
+          - AttributeName: sk
+            # Denna är sort key
+            KeyType: RANGE
+        # Om denna inte finns med så kommer den att sätta på provision
+        BillingMode: PAY_PER_REQUEST
