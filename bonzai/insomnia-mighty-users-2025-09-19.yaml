@@ -1,0 +1,215 @@
+type: collection.insomnia.rest/5.0
+name: Bonzai copy
+meta:
+  id: wrk_a3bb561ee20b4892a3e4dc7fce11c350
+  created: 1758270787014
+  modified: 1758270787014
+  description: ""
+collection:
+  - name: Rooms
+    meta:
+      id: fld_b61ed955a6bd4a5da212fb83a5b63971
+      created: 1758020228576
+      modified: 1758033414577
+      sortKey: -1758020242486.25
+      description: ""
+    children:
+      - url: https://tjlw7gjfve.execute-api.eu-north-1.amazonaws.com/api/rooms
+        name: GET available rooms
+        meta:
+          id: req_a8efdbde96fd4d8aacdc7ab97e805704
+          created: 1757935796774
+          modified: 1758271049509
+          isPrivate: false
+          description: ""
+          sortKey: -1758020233796
+        method: GET
+        headers:
+          - name: User-Agent
+            value: insomnia/11.6.0
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: https://tjlw7gjfve.execute-api.eu-north-1.amazonaws.com/api/rooms
+        name: POST room
+        meta:
+          id: req_caeeb85d6cca46e398eaca4da8190b66
+          created: 1757935820348
+          modified: 1758020241263
+          isPrivate: false
+          description: ""
+          sortKey: -1758020233696
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {"available": true,
+             "beds": 1,
+             "price": 1500,
+            	"type": "double"}
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/11.6.0
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+  - name: Orders
+    meta:
+      id: fld_7eb3593e3b1d40ed94ac032d13a20bd6
+      created: 1758020247123
+      modified: 1758020247123
+      sortKey: -1758020247123
+      description: ""
+    children:
+      - url: https://tjlw7gjfve.execute-api.eu-north-1.amazonaws.com/api/orders/c5670
+        name: DELETE order
+        meta:
+          id: req_5cca878cdf5f4d66a9f29cd2de12128b
+          created: 1758009424542
+          modified: 1758271287888
+          isPrivate: false
+          description: ""
+          sortKey: -1758022391884
+        method: DELETE
+        headers:
+          - name: User-Agent
+            value: insomnia/11.6.0
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: https://tjlw7gjfve.execute-api.eu-north-1.amazonaws.com/api/orders
+        name: GET all orders
+        meta:
+          id: req_e59cb18541574160bea01f55b0f7cf9f
+          created: 1758020124443
+          modified: 1758271151940
+          isPrivate: false
+          description: ""
+          sortKey: -1758022391984
+        method: GET
+        headers:
+          - name: User-Agent
+            value: insomnia/11.6.0
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: https://tjlw7gjfve.execute-api.eu-north-1.amazonaws.com/api/orders/c5670
+        name: GET order by id
+        meta:
+          id: req_acd91a12e0ab41ab9e8fa94994393a2e
+          created: 1758020698526
+          modified: 1758271235663
+          isPrivate: false
+          description: ""
+          sortKey: -1758022391934
+        method: GET
+        headers:
+          - name: User-Agent
+            value: insomnia/11.6.0
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: https://tjlw7gjfve.execute-api.eu-north-1.amazonaws.com/api/orders/c5670
+        name: PUT order by id
+        meta:
+          id: req_0c29aeca42f242858940b65679b108b5
+          created: 1758270677001
+          modified: 1758271275007
+          isPrivate: false
+          description: ""
+          sortKey: -1758022391896.5
+        method: PUT
+        body:
+          mimeType: application/json
+          text: |-
+            {
+            "removeRoomId" : "ROOM#DOUBLE#aafc7",
+            "newRoomId" : "ROOM#DOUBLE#f55dc",
+            "numberOfNights": 3
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/11.6.0
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: https://tjlw7gjfve.execute-api.eu-north-1.amazonaws.com/api/orders
+        name: POST order
+        meta:
+          id: req_54721fcf39be4e50b21b864502d16116
+          created: 1758270740591
+          modified: 1758271187873
+          isPrivate: false
+          description: ""
+          sortKey: -1758022391909
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+                "numberOfGuests": 1,
+                "rooms": ["ROOM#DOUBLE#aafc7"],
+                "numberOfNights": 5,
+                "name": "Gustaf Fröding",
+                "email": "user@usermail.com"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/11.6.0
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+cookieJar:
+  name: Default Jar
+  meta:
+    id: jar_e35a53b2d69040f0931f075e076b0091
+    created: 1757935792532
+    modified: 1757935792532
+environments:
+  name: Base Environment
+  meta:
+    id: env_f775e726a6404459b1d8a3d82eed9ed7
+    created: 1757935792531
+    modified: 1757935792531
+    isPrivate: false
